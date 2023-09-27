@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "ignoreDeprecations": "5.0",
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "outDir": "./dist"
+  },
+  "include": [
+    "lib/**/*.ts"
+  ]
+}

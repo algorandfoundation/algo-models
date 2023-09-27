@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "preserveValueImports": true,
+    "declarationDir": "dist/types",
+    "outDir": "dist/esm",
+    "module": "esnext",
+    "target": "esnext",
+    "declaration": true
+  },
+  "extends": "./tsconfig.json"
+}

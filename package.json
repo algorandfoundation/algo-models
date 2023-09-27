@@ -1,0 +1,25 @@
+{
+  "name": "@algorandfoundation/transaction-crafter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    "./another-place": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
