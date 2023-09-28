@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@algorandfoundation/transaction-crafter": "file:../.."
+    "@algorandfoundation/algo-models": "file:../.."
   },
   "devDependencies": {
     "ts-node": "^10.9.1",

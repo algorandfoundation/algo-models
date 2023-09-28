@@ -1,4 +1,4 @@
-import { SignKeyPair, randomBytes } from "tweetnacl"
+import { type SignKeyPair, randomBytes } from "tweetnacl"
 import { sha512_256 } from "js-sha512"
 import base32 from "hi-base32"
 import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"

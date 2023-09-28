@@ -1,5 +1,5 @@
 
-import { AlgorandTransactionCrafter } from '@algorandfoundation/transaction-crafter'
+import { AlgorandTransactionCrafter } from '@algorandfoundation/algo-models'
 
 let atc = new AlgorandTransactionCrafter('testnet-v1.0', 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=')
 let pay = atc.pay(123, 'R2HYOMCQIIVZLYYSVQ7RRDME5QB2NNACNIYEYIIN3NCTEKHEVE4RJRNWN4', 'R2HYOMCQIIVZLYYSVQ7RRDME5QB2NNACNIYEYIIN3NCTEKHEVE4RJRNWN4')

@@ -1,5 +1,5 @@
 {
-  "name": "@algorandfoundation/transaction-crafter",
+  "name": "@algorandfoundation/algo-models",
   "version": "1.0.0",
   "description": "",
   "main": "dist/cjs/index.js",

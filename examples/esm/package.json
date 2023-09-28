@@ -11,6 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@algorandfoundation/transaction-crafter": "file:../.."
+    "@algorandfoundation/algo-models": "file:../.."
   }
 }
