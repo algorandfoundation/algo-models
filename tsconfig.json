@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "strict": true,
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "ignoreDeprecations": "5.0",
     "isolatedModules": true,
     "moduleResolution": "node",
