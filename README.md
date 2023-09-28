@@ -70,6 +70,7 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
     }
   },
   "required": [
+    "type",
     "snd",
     "rcv",
     "amt",
@@ -157,6 +158,7 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
     }
   },
   "required": [
+    "type",
     "snd",
     "fee",
     "fv",
@@ -214,6 +216,7 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
     },
   },
   "required": [
+    "type",
     "snd",
     "fee",
     "fv",
@@ -269,6 +272,7 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
     }
   },
   "required": [
+    "type",
     "snd",
     "fee",
     "fv",
