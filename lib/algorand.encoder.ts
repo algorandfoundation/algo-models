@@ -12,24 +12,6 @@ const ALGORAND_ADDRESS_LENGTH = 58
 const HASH_BYTES_LENGTH = 32
 export const MALFORMED_ADDRESS_ERROR_MSG = "Malformed address"
 export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
-export const ERROR_CONTAINS_EMPTY_STRING = 'The object contains empty or 0 values. First empty or 0 value encountered during encoding: '
-
-/**
- * containsEmpty returns true if any of the object's values are empty, false otherwise.
- * Empty arrays considered empty
- * @param obj - The object to check
- * @returns \{true, empty key\} if contains empty, \{false, undefined\} otherwise
- */
-function containsEmpty(obj: Record<string | number | symbol, any>) {
-	for (const key in obj) {
-	  if (Object.prototype.hasOwnProperty.call(obj, key)) {
-		if (!obj[key] || obj[key].length === 0) {
-		  return { containsEmpty: true, firstEmptyKey: key };
-		}
-	  }
-	}
-	return { containsEmpty: false, firstEmptyKey: undefined };
-  }
 
 export class AlgorandEncoder extends Encoder{
 	/**
@@ -75,12 +57,6 @@ export class AlgorandEncoder extends Encoder{
 	 * @returns 
 	 */
 	encodeSignedTransaction(stx: object): Uint8Array {
-		// Check for empty values
-		const emptyCheck = containsEmpty(stx);
-		if (emptyCheck.containsEmpty) {
-		  throw new Error(ERROR_CONTAINS_EMPTY_STRING + emptyCheck.firstEmptyKey);
-		}
-
 		const encodedTxn: Uint8Array = new Uint8Array(msgpack.encode(stx, { sortKeys: true, ignoreUndefined: true }))
 		return encodedTxn
 	}
@@ -90,13 +66,6 @@ export class AlgorandEncoder extends Encoder{
 	 * @param tx
 	 */
 	encodeTransaction(tx: any): Uint8Array {
-		// Check for empty values
-		const emptyCheck = containsEmpty(tx);
-		if (emptyCheck.containsEmpty) {
-		  throw new Error(ERROR_CONTAINS_EMPTY_STRING + emptyCheck.firstEmptyKey);
-		}
-		
-
 		// [TAG] [AMT] .... [NOTE] [RCV] [SND] [] [TYPE]
 		const encoded: Uint8Array = msgpack.encode(tx, { sortKeys: true, ignoreUndefined: true })
 

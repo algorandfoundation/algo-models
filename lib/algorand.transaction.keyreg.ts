@@ -20,31 +20,6 @@ export class KeyregTransaction {
 	// encode the transaction
 	// return the encoded transaction
 	encode(): Uint8Array {
-		// delete optional fields if undefined
-		if (this.note === undefined) {
-			delete this.note
-		}
-		if (this.votekey === undefined) {
-			delete this.votekey
-		}
-		if (this.selkey === undefined) {
-			delete this.selkey
-		}
-		if (this.sprfkey === undefined) {
-			delete this.sprfkey
-		}
-		if (this.votefst === undefined) {
-			delete this.votefst
-		}
-		if (this.votelst === undefined) {
-			delete this.votelst
-		}
-		if (this.votekd === undefined) {
-			delete this.votekd
-		}
-		if (this.nonpart === undefined) {
-			delete this.nonpart
-		}
 		const encoded: Uint8Array = new AlgorandEncoder().encodeTransaction(this)
 		return encoded
 	}

@@ -15,10 +15,6 @@ export class PayTransaction {
 	// encode the transaction
 	// return the encoded transaction
 	encode(): Uint8Array {
-		// delete note if undefined
-		if (this.note === undefined) {
-			delete this.note
-		}
 		const encoded: Uint8Array = new AlgorandEncoder().encodeTransaction(this)
 		return encoded
 	}

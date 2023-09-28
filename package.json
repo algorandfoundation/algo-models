@@ -39,8 +39,13 @@
     "transform": {
       ".+\\.(t|j)s$": [ "ts-jest", {"useEsm": true}]
     },
+    "coverageDirectory": "./coverage",
     "collectCoverageFrom": [
       "**/!(*.module|*.interface|main|repl|exception.filter|logging.interceptor).{ts,js}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "./coverage",
+      "./index.ts"
     ],
     "testEnvironment": "node",
     "moduleNameMapper": {
