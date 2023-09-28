@@ -21,6 +21,11 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
 {
   "type": "object",
   "properties": {
+    "type": {
+        "type": "string",
+        "description": "The transaction's type",
+        "const": "pay"
+    },
     "snd": {
         "type": "Uint8Array",
         "description": "Sender's public key, 32 bytes",
@@ -85,6 +90,11 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
 {
   "type": "object",
   "properties": {
+    "type": {
+        "type": "string",
+        "description": "The transaction's type",
+        "const": "keyreg"
+    },
     "snd": {
         "type": "Uint8Array",
         "description": "Sender's public key, 32 bytes",
@@ -170,6 +180,11 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
 {
   "type": "object",
   "properties": {
+    "type": {
+        "type": "string",
+        "description": "The transaction's type",
+        "const": "keyreg"
+    },
     "snd": {
         "type": "Uint8Array",
         "description": "Sender's public key, 32 bytes",
@@ -216,6 +231,11 @@ The following is the JSON Schema for a Pay Transaction. The schema is:
 {
   "type": "object",
   "properties": {
+    "type": {
+        "type": "string",
+        "description": "The transaction's type",
+        "const": "keyreg"
+    },
     "snd": {
         "type": "Uint8Array",
         "description": "Sender's public key, 32 bytes",
