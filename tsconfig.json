@@ -6,6 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "ignoreDeprecations": "5.0",
     "isolatedModules": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node",
     "outDir": "./dist"
   },
