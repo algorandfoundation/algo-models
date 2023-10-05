@@ -1,14 +1,41 @@
 # Algorand Transaction Crafting and Signing Instructions
 
+## Tests
 
-## Steps
-- Craft tx model
-- msgpack (use algorand fork) encode tx with alphabetically ordered fields 
-- Add byte representation of "TX" as a prefix. I.e {TAG}{msgpack encoded tx}. That is the "raw bytes"
-- Sign "raw bytes" => EdDSA ( SHA512 (M))
-- Attach Signature to a new model {sig, tx}
-- Re-Encode {sig, tx} with msgpack(algo fork) **but** without "TX" TAG this time. These are the "ready-to-post" bytes
-- REST POST with `application/x-binary` as Content-type to algod
+```shell
+$ yarn install
+$ yarn test:cov
+```
+
+## Craft Pay Transaction
+
+```ts
+import { PayTransaction, PayTxBuilder } from 'algorand.transaction.pay.ts'
+
+// Some values
+const genesisHash = "someGenesisHash"
+const genId = "someGenId"
+const amount = 1000
+const from = "someAddress"
+const to = "someOtherAddress"
+const firstValidRound = 1000
+const lastValidRound = 2000
+
+const tx: PayTransaction = new PayTxBuilder(genId, genesisHash)
+    .addAmount(amount)
+    .addSender(from)
+    .addReceiver(to)
+    .addFirstValidRound(firstValidRound)
+    .addLastValidRound(lastValidRound)
+    .get()
+
+const encoded: Uint8Array = tx.encode()
+
+// sign encoded
+// attach signature
+// push
+
+```
 
 
 ## Schemas for models
