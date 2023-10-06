@@ -73,8 +73,8 @@ export class PayTxBuilder implements IPayTxBuilder {
 		return this
 	}
 
-	addNote(note: string, encoding: BufferEncoding = "base64"): IPayTxBuilder {
-		this.tx.note = Buffer.from(note, encoding)
+	addNote(note: string, encoding: BufferEncoding = "utf8"): IPayTxBuilder {
+		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
 		return this
 	}
 

@@ -2,6 +2,11 @@ import { randomBytes } from "tweetnacl"
 import { AlgorandEncoder } from "./algorand.encoder"
 import * as msgpack from "algo-msgpack-with-bigint"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
+import { PayTransaction } from "./algorand.transaction.pay"
+import { KeyregTransaction } from "./algorand.transaction.keyreg"
+import Ajv, {JSONSchemaType} from "ajv"
+import path from "path"
+import fs from 'fs'
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
@@ -18,6 +23,7 @@ export function concatArrays(...arrs: ArrayLike<number>[]) {
 
 describe("Algorand Transaction Crafter", () => {
 	let algorandCrafter: AlgorandTransactionCrafter
+	let algoEncoder: AlgorandEncoder
 
 	const genesisId: string = "GENESIS_ID"
 	// genesis in base64
@@ -25,6 +31,7 @@ describe("Algorand Transaction Crafter", () => {
 
 	beforeEach(async () => {
 		algorandCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
+		algoEncoder = new AlgorandEncoder()
 	})
 
 	afterEach(() => {
@@ -50,5 +57,173 @@ describe("Algorand Transaction Crafter", () => {
 		}
 
 		expect(result).toEqual(msgpack.encode(expected, { sortKeys: true }))
+	})
+
+	describe("Pay Transactions", () => {
+		let paySchema: JSONSchemaType<PayTransaction>
+
+		beforeAll(async () => {
+			paySchema = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/pay.transaction.json"), "utf8"))
+		})
+
+		it("(OK) Craft Pay Transaction", async () => {
+			// from algorand address
+			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+			// to algorand address
+			const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+	
+			// note
+			const note: string = Buffer.from(randomBytes(128)).toString("base64")
+	
+			// create pay transaction
+			const txn: PayTransaction = algorandCrafter
+				.pay(1000, from, to)
+				.addFirstValidRound(1000)
+				.addLastValidRound(2000)
+				.addNote(note, "base64")
+				.addFee(1000)
+				.get()
+	
+			expect(txn).toBeDefined()
+			expect(txn).toBeInstanceOf(PayTransaction)
+			expect(txn).toEqual({
+				rcv: algoEncoder.decodeAddress(to),
+				snd: algoEncoder.decodeAddress(from),
+				amt: 1000,
+				fv: 1000,
+				lv: 2000,
+				gen: genesisId,
+				gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
+				note: new Uint8Array(Buffer.from(note, "base64")),
+				fee: 1000,
+				type: "pay",
+			})
+
+			const ajv = new Ajv()
+			const validate = ajv.compile(paySchema)
+			expect(validate(txn)).toBe(true)
+		})	
+	})
+
+	describe("KeyReg Transactions", () => {
+		let keyRegSchema: JSONSchemaType<KeyregTransaction>
+
+		beforeAll(async () => {
+			keyRegSchema = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.json"), "utf8"))
+		})
+
+		it("(OK) Craft Keyreg change-online transaction", async () => {
+			// from algorand address
+			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+	
+			// note
+			const note: string = Buffer.from(randomBytes(32)).toString("base64")
+	
+			// vote key
+			const voteKey: string = Buffer.from(randomBytes(32)).toString("base64")
+	
+			// selection key
+			const selectionKey: string = Buffer.from(randomBytes(32)).toString("base64")
+	
+			// state proof key
+			const stateProofKey: string = Buffer.from(randomBytes(64)).toString("base64")
+	
+			// create keyreg transaction
+			const txn: KeyregTransaction = algorandCrafter
+				.changeOnline(from, voteKey, selectionKey, stateProofKey, 1000, 2000, 32)
+				.addFirstValidRound(1000)
+				.addLastValidRound(2000)
+				.addNote(note, "base64")
+				.addFee(1000)
+				.get()
+	
+			expect(txn).toBeDefined()
+			expect(txn).toBeInstanceOf(KeyregTransaction)
+			expect(txn).toEqual({
+				snd: algoEncoder.decodeAddress(from),
+				votekey: new Uint8Array(Buffer.from(voteKey, "base64")),
+				selkey: new Uint8Array(Buffer.from(selectionKey, "base64")),
+				sprfkey: new Uint8Array(Buffer.from(stateProofKey, "base64")),
+				votefst: 1000,
+				votelst: 2000,
+				votekd: 32,
+				fv: 1000,
+				lv: 2000,
+				gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
+				note: new Uint8Array(Buffer.from(note, "base64")),
+				fee: 1000,
+				type: "keyreg",
+			})
+
+			const ajv = new Ajv()
+			const validate = ajv.compile(keyRegSchema)
+			expect(validate(txn)).toBe(true)
+		})
+	
+		it("(OK) Craft Keyreg change-ofline transaction", async () => {
+			// from algorand address
+			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+	
+			// note
+			const note: string = Buffer.from(randomBytes(32)).toString("base64")
+	
+			// create keyreg transaction
+			const txn: KeyregTransaction = algorandCrafter
+				.changeOffline(from)
+				.addFirstValidRound(1000)
+				.addLastValidRound(2000)
+				.addNote(note, "base64")
+				.addFee(1000)
+				.get()
+	
+			expect(txn).toBeDefined()
+			expect(txn).toBeInstanceOf(KeyregTransaction)
+			expect(txn).toEqual({
+				snd: algoEncoder.decodeAddress(from),
+				fv: 1000,
+				lv: 2000,
+				gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
+				note: new Uint8Array(Buffer.from(note, "base64")),
+				fee: 1000,
+				type: "keyreg",
+			})
+		})
+	
+		it("(OK) Craft Keyreg non-participation transaction", async () => {
+			// from algorand address
+			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+	
+			// note
+			const note: string = Buffer.from(randomBytes(32)).toString("base64")
+	
+			// create keyreg transaction
+			const txn: KeyregTransaction = algorandCrafter
+				.markNonParticipation(from)
+				.addFirstValidRound(1000)
+				.addLastValidRound(2000)
+				.addNote(note, "base64")
+				.addFee(1000)
+				.get()
+	
+			expect(txn).toBeDefined()
+			expect(txn).toBeInstanceOf(KeyregTransaction)
+			expect(txn).toEqual({
+				snd: algoEncoder.decodeAddress(from),
+				fv: 1000,
+				lv: 2000,
+				gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
+				note: new Uint8Array(Buffer.from(note, "base64")),
+				fee: 1000,
+				type: "keyreg",
+				nonpart: true,
+			})
+
+			// key reg no participation
+			const keyRegNonParticipationSchema: JSONSchemaType<KeyregTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.nonparticipation.json"), "utf8"))
+
+			const ajv = new Ajv()
+			const validate = ajv.compile(keyRegNonParticipationSchema)
+			expect(validate(txn)).toBe(true)
+		})
 	})
 })

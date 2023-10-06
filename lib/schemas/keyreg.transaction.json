@@ -1,0 +1,589 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/keyreg.transaction.json",
+  "title": "Key Registration Transaction",
+  "type": "object",
+  "properties": {
+    "gh": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
+    },
+    "type": {
+      "type": "string"
+    },
+    "fee": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "snd": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
+    },
+    "votekey": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
+    },
+    "selkey": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
+    },
+    "sprfkey": {
+      "$ref": "http://algo-models.com/schemas/bytes64.json"
+    },
+    "votefst": {
+      "type": "integer"
+    },
+    "votelst": {
+      "type": "integer"
+    },
+    "votekd": {
+      "type": "integer"
+    },
+    "fv": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lv": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "gh",
+    "type",
+    "fee",
+    "snd",
+    "votekey",
+    "selkey",
+    "sprfkey",
+    "votefst",
+    "votelst",
+    "votekd",
+    "fv",
+    "lv"
+  ],
+  "$defs": {
+    "bytes32": {
+      "$id": "http://algo-models.com/schemas/bytes32.json",
+      "type": "object",
+      "properties": {
+        "0": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "1": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "15": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "16": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "17": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "18": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "19": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "20": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "21": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "22": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "23": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "24": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "25": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "26": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "27": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "28": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "29": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "30": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "31": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "required": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31"
+      ]
+    },
+    "bytes64": {
+      "$id": "http://algo-models.com/schemas/bytes64.json",
+      "type": "object",
+      "properties": {
+        "0": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "1": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "15": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "16": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "17": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "18": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "19": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "20": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "21": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "22": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "23": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "24": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "25": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "26": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "27": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "28": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "29": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "30": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "31": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "32": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "33": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "34": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "35": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "36": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "37": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "38": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "39": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "40": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "41": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "42": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "43": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "44": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "45": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "46": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "47": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "48": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "49": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "50": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "51": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "52": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "53": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "54": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "55": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "56": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "57": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "58": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "59": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "60": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "61": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "62": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "63": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      }
+    }
+  }
+}

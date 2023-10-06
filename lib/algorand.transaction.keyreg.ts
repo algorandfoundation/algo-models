@@ -73,22 +73,22 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 	}
 
 	addNote(note: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
-		this.tx.note = Buffer.from(note, encoding)
+		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
 		return this
 	}
 
 	addVoteKey(voteKey: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
-		this.tx.votekey = Buffer.from(voteKey, encoding)
+		this.tx.votekey = new Uint8Array(Buffer.from(voteKey, encoding))
 		return this
 	}
 
 	addSelectionKey(selectionKey: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
-		this.tx.selkey = Buffer.from(selectionKey, encoding)
+		this.tx.selkey = new Uint8Array(Buffer.from(selectionKey, encoding))
 		return this
 	}
 
 	addStateProofKey(stateProofKey: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
-		this.tx.sprfkey = Buffer.from(stateProofKey, encoding)
+		this.tx.sprfkey = new Uint8Array(Buffer.from(stateProofKey, encoding))
 		return this
 	}
 
