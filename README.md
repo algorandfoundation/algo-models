@@ -40,4 +40,4 @@ const encoded: Uint8Array = tx.encode()
 
 ## Schemas for models
 
-Available in [schemas](./schemas) folder
+Available in [schemas](./lib/schemas) folder
