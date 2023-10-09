@@ -7,8 +7,11 @@
     "ignoreDeprecations": "5.0",
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "sourceMap": true,
+    "declaration": true,
     "moduleResolution": "node",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "target": "ES2022",
   },
   "include": [
     "lib/**/*.ts"
