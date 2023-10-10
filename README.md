@@ -27,6 +27,16 @@ This package is meant for integrators that want to add Algorand's functionality 
         - The encoded object doesn't include the `txn` field, only it's parameters. 
         - `gh` is not a base64 string but the decoded bytes of the genesis hash. 32 bytes in size. 
 
+## Install
+```shell
+$ yarn add @algorandfoundation/algo-models
+```
+
+or
+
+```shell
+$ git clone git@github.com:algorandfoundation/algo-models 
+```
 
 ## Tests
 
