@@ -1,6 +1,6 @@
 {
   "name": "@algorandfoundation/algo-models",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -10,8 +10,8 @@
     "require": "./dist/cjs/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
-    "test": "jest lib",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.json",
+    "test": "jest lib --verbose",
     "test:cov": "jest lib --coverage"
   },
   "author": "",
