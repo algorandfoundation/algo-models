@@ -11,7 +11,8 @@
       "$ref": "bytes32.json"
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "const": "pay"
     },
     "fee": {
       "type": "integer"
