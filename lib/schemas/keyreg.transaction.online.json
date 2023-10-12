@@ -1,14 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://algo-models.com/schemas/keyreg.transaction.json",
-  "title": "Key Registration Transaction",
+  "$id": "http://algo-models.com/schemas/keyreg.transaction.online.json",
+  "title": "Key Registration Online Transaction",
   "type": "object",
   "properties": {
     "gh": {
       "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "const": "keyreg"
+    },
+    "nonpart": {
+      "type": "boolean",
+      "const": false
     },
     "fee": {
       "type": "integer",

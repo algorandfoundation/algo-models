@@ -8,7 +8,12 @@
       "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "const": "keyreg"
+    },
+    "nonpart": {
+      "type": "boolean",
+      "const": true
     },
     "fee": {
       "type": "integer",
@@ -16,9 +21,6 @@
     },
     "snd": {
       "$ref": "http://algo-models.com/schemas/bytes32.json"
-    },
-    "nonpart": {
-      "type": "boolean"
     },
     "fv": {
       "type": "integer",
@@ -32,9 +34,9 @@
   "required": [
     "gh",
     "type",
+    "nonpart",
     "fee",
     "snd",
-    "nonpart",
     "fv",
     "lv",
     "note"
