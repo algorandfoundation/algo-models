@@ -8,7 +8,8 @@
       "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "const": "keyreg"
     },
     "fee": {
       "type": "integer",
