@@ -22,12 +22,21 @@ export function concatArrays(...arrs: ArrayLike<number>[]) {
 }
 
 describe("Algorand Transaction Crafter", () => {
+	let algorandCrafter: AlgorandTransactionCrafter
+	let algoEncoder: AlgorandEncoder
+
 	const genesisId: string = "GENESIS_ID"
 	// genesis in base64
 	const genesisHash: string = Buffer.from(randomBytes(32)).toString("base64")
 
-	const algorandCrafter: AlgorandTransactionCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
-	const algoEncoder: AlgorandEncoder = new AlgorandEncoder()
+	beforeEach(async () => {
+		algorandCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
+		algoEncoder = new AlgorandEncoder()
+	})
+
+	afterEach(() => {
+		jest.resetAllMocks()
+	})
 
 	it("(OK) addSignature", async () => {
 		let algoEncoder: AlgorandEncoder = new AlgorandEncoder()
