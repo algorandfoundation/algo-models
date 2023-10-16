@@ -6,7 +6,6 @@ import * as msgpack from "algo-msgpack-with-bigint"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
-import { Key } from "readline"
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
