@@ -4,7 +4,7 @@ import * as msgpack from "algo-msgpack-with-bigint"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
-import Ajv, {JSONSchemaType} from "ajv"
+import Ajv, {type JSONSchemaType} from "ajv"
 import path from "path"
 import fs from 'fs'
 
@@ -60,11 +60,7 @@ describe("Algorand Transaction Crafter", () => {
 	})
 
 	describe("Pay Transactions", () => {
-		let paySchema: JSONSchemaType<PayTransaction>
-
-		beforeAll(async () => {
-			paySchema = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/pay.transaction.json"), "utf8"))
-		})
+		let paySchema: JSONSchemaType<PayTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/pay.transaction.json"), "utf8"))
 
 		it("(OK) Craft Pay Transaction", async () => {
 			// from algorand address
@@ -105,12 +101,8 @@ describe("Algorand Transaction Crafter", () => {
 		})	
 	})
 
-	describe("KeyReg Transactions", () => {
-		let keyRegSchema: JSONSchemaType<KeyregTransaction>
-
-		beforeAll(async () => {
-			keyRegSchema = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.json"), "utf8"))
-		})
+	describe("KeyReg Online Transactions", () => {
+		let keyRegSchema: JSONSchemaType<KeyregTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.online.json"), "utf8"))
 
 		it("(OK) Craft Keyreg change-online transaction", async () => {
 			// from algorand address
@@ -139,6 +131,11 @@ describe("Algorand Transaction Crafter", () => {
 	
 			expect(txn).toBeDefined()
 			expect(txn).toBeInstanceOf(KeyregTransaction)
+
+			const ajv = new Ajv()
+			const validate = ajv.compile(keyRegSchema)
+			expect(validate(txn)).toBe(true)
+
 			expect(txn).toEqual({
 				snd: algoEncoder.decodeAddress(from),
 				votekey: new Uint8Array(Buffer.from(voteKey, "base64")),
@@ -154,13 +151,13 @@ describe("Algorand Transaction Crafter", () => {
 				fee: 1000,
 				type: "keyreg",
 			})
-
-			const ajv = new Ajv()
-			const validate = ajv.compile(keyRegSchema)
-			expect(validate(txn)).toBe(true)
 		})
-	
-		it("(OK) Craft Keyreg change-ofline transaction", async () => {
+	})
+
+	describe("KeyReg Offline Transactions", () => {
+		let keyRegSchema: JSONSchemaType<KeyregTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.offline.json"), "utf8"))
+
+		it("(OK) Craft Keyreg change-offline transaction", async () => {
 			// from algorand address
 			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 	
@@ -187,8 +184,19 @@ describe("Algorand Transaction Crafter", () => {
 				fee: 1000,
 				type: "keyreg",
 			})
+
+			const ajv = new Ajv()
+			const validate = ajv.compile(keyRegSchema)
+			expect(validate(txn)).toBe(true)
 		})
-	
+	})
+
+	describe("KeyReg Non-participation Transactions", () => {
+		let keyRegSchema: JSONSchemaType<KeyregTransaction>
+
+		beforeAll(async () => {
+			keyRegSchema = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.nonparticipation.json"), "utf8"))
+		})
 		it("(OK) Craft Keyreg non-participation transaction", async () => {
 			// from algorand address
 			const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
@@ -218,11 +226,8 @@ describe("Algorand Transaction Crafter", () => {
 				nonpart: true,
 			})
 
-			// key reg no participation
-			const keyRegNonParticipationSchema: JSONSchemaType<KeyregTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/keyreg.transaction.nonparticipation.json"), "utf8"))
-
 			const ajv = new Ajv()
-			const validate = ajv.compile(keyRegNonParticipationSchema)
+			const validate = ajv.compile(keyRegSchema)
 			expect(validate(txn)).toBe(true)
 		})
 	})

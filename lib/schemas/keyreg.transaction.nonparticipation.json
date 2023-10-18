@@ -11,15 +11,16 @@
       "type": "string",
       "const": "keyreg"
     },
+    "nonpart": {
+      "type": "boolean",
+      "const": true
+    },
     "fee": {
       "type": "integer",
       "minimum": 0
     },
     "snd": {
       "$ref": "http://algo-models.com/schemas/bytes32.json"
-    },
-    "nonpart": {
-      "type": "boolean"
     },
     "fv": {
       "type": "integer",
@@ -33,9 +34,9 @@
   "required": [
     "gh",
     "type",
+    "nonpart",
     "fee",
     "snd",
-    "nonpart",
     "fv",
     "lv",
     "note"
