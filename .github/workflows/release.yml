@@ -1,0 +1,34 @@
+name: Release
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+      packages: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: npm ci
+      - run: npm run release
+        env:
+          NPM_CONFIG_REGISTRY: 'https://npm.pkg.github.com'
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f
+        if: github.ref == 'refs/heads/main'
+        with:
+          type: now
+          from_branch: main
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -11,14 +11,28 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.json",
+    "commit": "cz",
     "test": "jest lib --verbose",
-    "test:cov": "jest lib --coverage"
+    "test:cov": "jest lib --coverage",
+    "release": "semantic-release",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
+    "@commitlint/cli": "^17.8.0",
+    "@commitlint/config-conventional": "^17.8.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^11.0.0",
+    "@semantic-release/release-notes-generator": "^12.0.0",
     "@types/jest": "^29.5.5",
     "@types/node": "^20.7.1",
+    "commitizen": "^4.3.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.2",
+    "semantic-release": "^22.0.5",
     "ts-jest": "^29.1.1",
     "tweetnacl": "^1.0.3",
     "typescript": "^5.2.2"
@@ -28,6 +42,39 @@
     "algo-msgpack-with-bigint": "^2.1.1",
     "hi-base32": "^0.5.1",
     "js-sha512": "^0.8.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "develop",
+        "prerelease": "beta"
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "CHANGELOG.md"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      "@semantic-release/github"
+    ]
   },
   "jest": {
     "moduleFileExtensions": [
