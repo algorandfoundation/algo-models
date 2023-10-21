@@ -3,6 +3,8 @@ import { AlgorandEncoder } from "./algorand.encoder.js"
 import { type IPayTxBuilder, PayTxBuilder } from "./algorand.transaction.pay.js"
 import { type IKeyregTxBuilder, KeyregTxBuilder } from "./algorand.transaction.keyreg.js"
 import * as msgpack from "algo-msgpack-with-bigint"
+import { AssetTransferTxBuilder, IAssetTransferTxBuilder } from "./algorand.asset.transfer.js"
+import { AssetCreateTxBuilder, IAssetCreateTxBuilder } from "./algorand.asset.create.js"
 
 export class AlgorandTransactionCrafter extends Crafter {
 
@@ -62,6 +64,27 @@ export class AlgorandTransactionCrafter extends Crafter {
 		return new KeyregTxBuilder(this.genesisHash)
 			.addSender(from)
 			.addNonParticipation(true)
+	}
+
+	/**
+	 * 
+	 */
+	assetTransfer(assetId: number, from: string, to: string, amount: number | bigint): IAssetTransferTxBuilder {
+		return new AssetTransferTxBuilder(this.genesisId, this.genesisHash, assetId, from, to, amount)
+			.addFee(1000)
+
+	}
+
+	/**
+	 * 
+	 */
+	asset(from: string, unit: string, decimals: bigint, totalTokens: number): IAssetCreateTxBuilder {
+		return new AssetCreateTxBuilder(this.genesisId, this.genesisHash, decimals, totalTokens, false)
+			.addSender(from)
+			.addFee(1000)
+			.addFirstValidRound(1000)
+			.addLastValidRound(2000)
+			.addUnit(unit)
 	}
 
 	/**
