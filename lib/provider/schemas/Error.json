@@ -1,0 +1,39 @@
+{
+  "$id": "/schemas/error",
+  "title": "Error",
+  "description": "Details the type of error and a human-readable message that can be displayed to the user",
+  "type": "object",
+  "properties": {
+    "code": {
+      "description": "An integer that defines the type of error",
+      "enum": [
+        4000,
+        4001,
+        4002,
+        4003,
+        4004,
+        4100,
+        4200,
+        4201,
+        4300
+      ]
+    },
+    "data": {
+      "type": "object",
+      "description": "Additional information about the error"
+    },
+    "message": {
+      "type": "string",
+      "description": "A human-readable message about the error"
+    },
+    "providerId": {
+      "type": "number",
+      "description": "A unique identifier for the provider",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "code",
+    "message"
+  ]
+}

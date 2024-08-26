@@ -1,0 +1,44 @@
+{
+  "$id": "/schemas/request-message",
+  "title": "Request Message",
+  "description": "Outlines the structure of a request message",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "A globally unique identifier for the message",
+      "format": "uuid"
+    },
+    "reference": {
+      "description": "Identifies the purpose of the message",
+      "enum": [
+        "arc0027:disable:request",
+        "arc0027:discover:request",
+        "arc0027:enable:request",
+        "arc0027:post_transactions:request",
+        "arc0027:sign_and_post_transactions:request",
+        "arc0027:sign_message:request",
+        "arc0027:sign_transactions:request"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reference": {
+            "const": "arc0027:sign_transactions:request"
+          }
+        },
+        "required": ["id", "params", "reference"]
+      },
+      "then": {
+        "properties": {
+          "params": {
+            "$ref": "/schemas/sign-transactions-params"
+          }
+        }
+      }
+    }
+  ]
+}

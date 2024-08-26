@@ -1,0 +1,66 @@
+{
+  "$id": "/schemas/sign-transactions-params",
+  "title": "Sign Transactions Params",
+  "description": "Sends a list of transactions to be signed by the provider(s)",
+  "type": "object",
+  "properties": {
+    "providerId": {
+      "type": "string",
+      "description": "A unique identifier for the provider",
+      "format": "uuid"
+    },
+    "txns": {
+      "type": "array",
+      "description": "A list of transactions to be signed by the provider(s)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "authAddr": {
+            "type": "string",
+            "description": "The auth address if the sender has rekeyed"
+          },
+          "msig": {
+            "type": "object",
+            "description": "Extra metadata needed when sending multisig transactions",
+            "properties": {
+              "addrs": {
+                "type": "array",
+                "description": "A list of Algorand addresses representing possible signers for the multisig",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "threshold": {
+                "type": "integer",
+                "description": "Multisig threshold value"
+              },
+              "version": {
+                "type": "integer",
+                "description": "Multisig version"
+              }
+            }
+          },
+          "signers": {
+            "type": "array",
+            "description": "A list of addresses to sign with",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stxn": {
+            "type": "string",
+            "description": "The base64 encoded signed transaction"
+          },
+          "txn": {
+            "type": "string",
+            "description": "The base64 encoded unsigned transaction"
+          }
+        },
+        "required": ["txn"]
+      }
+    }
+  },
+  "required": [
+    "txns"
+  ]
+}
