@@ -6,19 +6,11 @@
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
-    "./provider": {
-      "import": "./dist/esm/provider/index.js",
-      "require": "./dist/cjs/provider/index.js",
-      "types": "./dist/types/provider/index.d.ts"
-    }
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.json",
     "test": "jest lib --verbose",
     "test:cov": "jest lib --coverage"
   },
@@ -27,19 +19,15 @@
   "devDependencies": {
     "@types/jest": "^29.5.5",
     "@types/node": "^20.7.1",
-    "@types/uuid": "^10.0.0",
     "ts-jest": "^29.1.1",
     "tweetnacl": "^1.0.3",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "ajv": "^8.12.0",
-    "ajv-formats": "^3.0.1",
     "algo-msgpack-with-bigint": "^2.1.1",
-    "cbor-x": "^1.6.0",
     "hi-base32": "^0.5.1",
-    "js-sha512": "^0.8.0",
-    "uuid": "^10.0.0"
+    "js-sha512": "^0.8.0"
   },
   "jest": {
     "moduleFileExtensions": [
