@@ -1,55 +1,149 @@
-# Starlight Starter Kit: Basics
+# TutorialKit Starter
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+👋 Welcome to TutorialKit!
 
-```
-npm create astro@latest -- --template starlight
-```
+This README includes everything you need to start writing your tutorial content quickly.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/withastro/starlight&create_from_path=examples/basics)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fwithastro%2Fstarlight%2Ftree%2Fmain%2Fexamples%2Fbasics&project-name=my-starlight-docs&repository-name=my-starlight-docs)
+## Project Structure
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
+```bash
 .
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   ├── docs/
-│   │   └── config.ts
-│   └── env.d.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+├── astro.config.mjs    # TutorialKit uses Astro 🚀 (https://astro.build)
+├── src
+│   ├── ...
+│   ├── content
+│   │   └── tutorial    # Your tutorial content lives here
+│   └── templates       # Your templates (see below for more information)
+├── public
+│   ├── favicon.svg
+│   └── logo.svg        # Default logo used in top left for your tutorial
+├── ...
+├── theme.ts            # Customize the theme of the tutorial
+└── uno.config.ts       # UnoCSS config (https://unocss.dev/)
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+## Getting Started
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+Make sure you have all dependencies installed and started the dev server:
 
-Static assets, like favicons, can be placed in the `public/` directory.
+```bash
+npm install
+npm run dev
+```
 
-## 🧞 Commands
+## UI Structure
 
-All commands are run from the root of the project, from a terminal:
+```markdown
+┌─────────────────────────────────────────────────────┐
+│ ● ● ●                                               │
+├───────────────────────────┬─────────────────────────┤
+│                           │                         │
+│                           │                         │
+│                           │                         │
+│                           │                         │
+│                           │       Code Editor       │
+│                           │                         │
+│                           │                         │
+│                           │                         │
+│                           │                         │
+│          Content          ├─────────────────────────┤
+│                           │                         │
+│                           │                         │
+│                           │  Preview & Boot Screen  │
+│                           │                         │
+│                           │                         │
+│                           ├─────────────────────────┤
+│                           │                         │
+│                           │        Terminal         │
+│                           │                         │
+└───────────────────────────┴─────────────────────────┘
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Authoring Content
 
-## 👀 Want to learn more?
+A tutorial consists of parts, chapters, and lessons. For example:
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+- Part 1: Basics of Vite
+  - Chapter 1: Introduction
+    - Lesson 1: Welcome!
+    - Lesson 2: Why Vite?
+    - …
+  - Chapter 2: Your first Vite project
+- Part 2: CLI
+  - …
+
+Your content is organized into lessons, with chapters and parts providing a structure and defining common metadata for these lessons.
+
+Here’s an example of how it would look like in `src/content/tutorial`:
+
+```bash
+tutorial
+├── 1-basics-of-vite
+│   ├── 1-introduction
+│   │   ├── 1-welcome
+│   │   │   ├── content.md    # The content of your lesson
+│   │   │   ├── _files        # Initial set of files
+│   │   │   │   └── ...
+│   │   │   └── _solution     # Solution of the lesson
+│   │   │       └── ...
+│   │   ├── 2-why-vite
+│   │   │   ├── content.md
+│   │   │   └── _files
+│   │   │       └── ...
+│   │   └── meta.md           # Metadata for the chapter
+│   └── meta.md               # Metadata for the part
+├── 2-advanced
+│   ├── ...
+│   └── meta.md
+└── meta.md                   # Metadata for the tutorial
+```
+
+### Supported Content Formats
+
+Content can be either written as Markdown (`.md`) files or using [MDX](https://mdxjs.com/) (`.mdx`). Files have a Front Matter at the top that contains the metadata and everything that comes after is the content of your lesson.
+
+**Example**
+
+```markdown
+---
+type: lesson
+title: Welcome!
+---
+
+# Welcome to TutorialKit!
+
+In this tutorial we'll walk you through how to setup your environment to
+write your first tutorial 🤩
+```
+
+The metadata file (`meta.md`) of parts, chapters, and lessons do not contain any content. It only contains the Front Matter for configuration.
+
+### Metadata
+
+Here is an overview of the properties that can be used as part of the Front Matter:
+
+| Property        | Required | Type                        | Inherited | Description                                                                                                                                           |
+| --------------- | -------- | --------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| type            | ✅       | `part \| chapter \| lesson` | ❌        | The type of the metadata.                                                                                                                             |
+| title           | ✅       | `string`                    | ❌        | The title of the part, chapter, or lesson.                                                                                                            |
+| slug            |          | `string`                    | ❌        | Let’s you customize the URL pathname which is `/:partSlug/:chapterSlug/:lessonSlug`.                                                                  |
+| previews        |          | `Preview[]`                 | ✅        | Configure which ports should be used for the previews. If not specified, the lowest port will be used.                                                |
+| autoReload      |          | `boolean`                   | ✅        | Navigating to a lesson that specifies `autoReload` will always reload the preview. This is typically only needed if your server does not support HMR. |
+| prepareCommands |          | `Command[]`                 | ✅        | List of commands to execute sequentially. They are typically used to install dependencies or to run scripts.                                          |
+| mainCommand     |          | `Command`                   | ✅        | The main command to be executed. This command will run after the `prepareCommands`.                                                                   |
+
+A `Command` has the following shape:
+
+```ts
+string | [command: string, title: string] | { command: string, title: string }
+```
+
+The `title` is used as part of the boot screen (see [UI Structure](#ui-structure)).
+
+A `Preview` has the following shape:
+
+```ts
+string | [port: number, title: string] | { port: number, title: string }
+```
+
+In most cases, metadata is inherited. For example, if you specify a `mainCommand` on a chapter without specifying it on any of its lessons, each lesson will use the `mainCommand` from its respective chapter. This extends to chapter and parts as well.
