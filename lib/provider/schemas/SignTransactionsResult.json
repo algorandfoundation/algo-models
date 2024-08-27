@@ -1,0 +1,21 @@
+{
+  "$id": "/schemas/sign-transactions-result",
+  "title": "Sign Transactions Result",
+  "description": "The response from a sign transactions request",
+  "type": "object",
+  "properties": {
+    "providerId": {
+      "type": "string",
+      "description": "A unique identifier for the provider",
+      "format": "uuid"
+    },
+    "stxns": {
+      "type": "array",
+      "description": "A list of signed transactions that is ready to be posted to the network",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["providerId", "stxns"]
+}

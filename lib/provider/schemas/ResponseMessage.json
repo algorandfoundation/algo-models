@@ -1,0 +1,60 @@
+{
+  "$id": "/schemas/response-message",
+  "title": "Response Message",
+  "description": "Outlines the structure of a response message",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "A globally unique identifier for the message",
+      "format": "uuid"
+    },
+    "reference": {
+      "description": "Identifies the purpose of the message",
+      "enum": [
+        "arc0027:disable:response",
+        "arc0027:discover:response",
+        "arc0027:enable:response",
+        "arc0027:post_transactions:response",
+        "arc0027:sign_and_post_transactions:response",
+        "arc0027:sign_message:response",
+        "arc0027:sign_transactions:response"
+      ]
+    },
+    "requestId": {
+      "type": "string",
+      "description": "The ID of the request message",
+      "format": "uuid"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reference": {
+            "const": "arc0027:sign_transactions:response"
+          }
+        },
+        "required": ["id", "reference", "requestId"]
+      },
+      "then": {
+        "oneOf": [
+          {
+            "properties": {
+              "result": {
+                "$ref": "/schemas/sign-transactions-result"
+              }
+            }
+          },
+          {
+            "properties": {
+              "error": {
+                "$ref": "/schemas/error"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
