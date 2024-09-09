@@ -6,6 +6,10 @@ import * as msgpack from "algo-msgpack-with-bigint"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
+import {AssetParamsBuilder} from "./algorand.asset.params";
+import {AssetConfigTransaction} from "./algorand.transaction.acfg";
+import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
+import {AssetTransferTransaction} from "./algorand.transaction.axfer";
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
@@ -135,7 +139,94 @@ describe("Algorand Encoding", () => {
 		const encoded: Uint8Array = txn.encode()
 		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
 	})
+	it("(OK) Encoding of asset config transaction", async () => {
+		// from algorand address
+		const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 
+		// note
+		const note: string = Buffer.from(randomBytes(32)).toString("base64")
+		const grp = randomBytes(32)
+		const lx = randomBytes(32)
+		const params = new AssetParamsBuilder()
+			.addTotal(1)
+			.addDecimals(1)
+			.addDefaultFrozen(false)
+			.addAssetName("Big Yeetus")
+			.addUnitName("YEET")
+			.addMetadataHash(randomBytes(32))
+			.addClawbackAddress(from)
+			.addFreezeAddress(from)
+			.addManagerAddress(from)
+			.addReserveAddress(from)
+			.get()
+
+		// create keyreg transaction
+		const txn: AssetConfigTransaction = algorandCrafter
+			.createAsset(from, params)
+			.addFirstValidRound(1000)
+			.addLastValidRound(2000)
+			.addNote(note, "base64")
+			.addFee(1000)
+			.addGroup(grp)
+			.addRekey(from)
+			.addLease(lx)
+			.get()
+
+		const encoded: Uint8Array = txn.encode()
+		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
+	})
+	it("(OK) Encoding of asset freeze transaction", async () => {
+		// from algorand address
+		const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+
+		// note
+		const note: string = Buffer.from(randomBytes(32)).toString("base64")
+		const grp = randomBytes(32)
+		const lx = randomBytes(32)
+
+		// create keyreg transaction
+		const txn: AssetFreezeTransaction = algorandCrafter
+			.freezeAsset(from, 1, true)
+			.addSender(from)
+			.addFirstValidRound(1000)
+			.addLastValidRound(2000)
+			.addNote(note, "base64")
+			.addFee(1000)
+			.addGroup(grp)
+			.addRekey(from)
+			.addLease(lx)
+			.get()
+
+		const encoded: Uint8Array = txn.encode()
+		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
+	})
+	it("(OK) Encoding of asset transfer transaction", async () => {
+		// from algorand address
+		const from: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+		const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
+
+		// note
+		const note: string = Buffer.from(randomBytes(32)).toString("base64")
+		const grp = randomBytes(32)
+		const lx = randomBytes(32)
+
+		// create keyreg transaction
+		const txn: AssetTransferTransaction = algorandCrafter
+			.transferAsset(from, 1, to, 1)
+			.addAssetCloseTo(from)
+			.addAssetSender(from)
+			.addFirstValidRound(1000)
+			.addLastValidRound(2000)
+			.addNote(note, "base64")
+			.addFee(1000)
+			.addGroup(grp)
+			.addRekey(from)
+			.addLease(lx)
+			.get()
+
+		const encoded: Uint8Array = txn.encode()
+		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
+	})
 	it("(OK) Encode & Decode Address ", async () => {
 		const keyPair: SignKeyPair = {
 			publicKey: Uint8Array.from([
