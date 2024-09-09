@@ -9,7 +9,7 @@ export class PayTransaction {
 	fv: number
 	lv: number
 	note?: Uint8Array
-	gen: string
+	gen?: string
 	gh: Uint8Array
 
 	// encode the transaction

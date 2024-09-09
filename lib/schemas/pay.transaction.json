@@ -7,8 +7,11 @@
     "gen": {
       "type": "string"
     },
+    "close": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
+    },
     "gh": {
-      "$ref": "bytes32.json"
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "type": {
       "type": "string",
@@ -21,10 +24,10 @@
       "type": "integer"
     },
     "snd": {
-      "$ref": "bytes32.json"
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "rcv": {
-      "$ref": "bytes32.json"
+      "$ref": "http://algo-models.com/schemas/bytes32.json"
     },
     "fv": {
       "type": "integer",
@@ -36,7 +39,6 @@
     }
   },
   "required": [
-    "gen",
     "gh",
     "type",
     "fee",
