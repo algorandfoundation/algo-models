@@ -161,6 +161,7 @@ describe("Algorand Encoding", () => {
 		const encodedAddress: string = algoEncoder.encodeAddress(Buffer.from(keyPair.publicKey))
 		// match addresses
 		expect(encodedAddress).toBe(addr)
+		expect(encodedAddress.length).toBe(58)
 
 		// decode back to public key
 		const decodedPublicKey: Uint8Array = algoEncoder.decodeAddress(encodedAddress)
