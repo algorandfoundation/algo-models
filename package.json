@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.json",
     "test": "jest lib --verbose",
-    "test:cov": "jest lib --coverage"
+    "test:cov": "jest lib --coverage",
+    "typedoc": "typedoc"
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
@@ -21,6 +22,7 @@
     "@types/node": "^20.7.1",
     "ts-jest": "^29.1.1",
     "tweetnacl": "^1.0.3",
+    "typedoc": "^0.26.7",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -47,6 +49,7 @@
     },
     "coverageDirectory": "./coverage",
     "collectCoverageFrom": [
+      "lib/**",
       "**/!(*.module|*.interface|main|repl|exception.filter|logging.interceptor).{ts,js}"
     ],
     "coveragePathIgnorePatterns": [
