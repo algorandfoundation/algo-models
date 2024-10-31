@@ -6,11 +6,14 @@
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.js"
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "test": "jest lib --verbose",
     "test:cov": "jest lib --coverage",
     "typedoc": "typedoc"
