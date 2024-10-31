@@ -112,7 +112,7 @@ const ajv = new Ajv()
 const paySchema: JSONSchemaType<PayTransaction> = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./schemas/pay.transaction.json"), "utf8"))
 
 const validate = ajv.compile(paySchema)
-expect(validate(encoded)).toBe(true)
+expect(validate(tx)).toBe(true)
 
 ```
 
