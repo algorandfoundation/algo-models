@@ -10,9 +10,18 @@ const ALGORAND_ADDRESS_BYTE_LENGTH = 36
 const ALGORAND_CHECKSUM_BYTE_LENGTH = 4
 const ALGORAND_ADDRESS_LENGTH = 58
 const HASH_BYTES_LENGTH = 32
+/**
+ * @internal
+ */
 export const MALFORMED_ADDRESS_ERROR_MSG = "Malformed address"
+/**
+ * @internal
+ */
 export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 
+/**
+ * @category Encoding
+ */
 export class AlgorandEncoder extends Encoder{
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
