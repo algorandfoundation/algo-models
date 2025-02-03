@@ -1,5 +1,6 @@
 import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.js";
+import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+
 /**
  * @category Transactions
  * @see {@link AlgorandTransactionCrafter}
