@@ -1,5 +1,5 @@
 import {AlgorandEncoder} from "./algorand.encoder.js"
-import {TransactionHeader, type ITransactionHeaderBuilder} from "./algorand.transaction.js";
+import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
 
 /**
  * Asset Transfer Transaction

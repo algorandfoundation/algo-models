@@ -15,4 +15,5 @@ export * from './algorand.transaction.pay.js'
 
 // Common
 export * from './algorand.asset.params.js'
+export * from './algorand.transaction.header.js'
 export * from './algorand.transaction.js'

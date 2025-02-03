@@ -11,7 +11,7 @@ import {AssetConfigTransaction} from "./algorand.transaction.acfg";
 import {AssetParamsBuilder} from "./algorand.asset.params";
 import {AssetTransferTransaction} from "./algorand.transaction.axfer";
 import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction";
+import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header";
 
 
 // Setup Validator
@@ -111,14 +111,14 @@ describe("Algorand Transaction Crafter", () => {
 			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
 			// to algorand address
 			const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
-	
+
 			// create pay transaction
 			const txn: PayTransaction = withTestTransactionHeader(
 				algorandCrafter
 					.pay(1000, from, to)
 					.addCloseTo(from)
 			).get()
-	
+
 			expect(txn).toBeDefined()
 			expect(txn).toBeInstanceOf(PayTransaction)
 			expect(txn).toEqual({
@@ -131,7 +131,7 @@ describe("Algorand Transaction Crafter", () => {
 
 			const validate = ajv.compile(paySchema)
 			expect(validate(txn)).toBe(true)
-		})	
+		})
 	})
 
 	describe("KeyReg Online Transactions", () => {
@@ -140,22 +140,22 @@ describe("Algorand Transaction Crafter", () => {
 		it("(OK) Craft Keyreg change-online transaction", async () => {
 			// from algorand address
 			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
-	
+
 			// vote key
 			const voteKey: string = Buffer.from(randomBytes(32)).toString("base64")
-	
+
 			// selection key
 			const selectionKey: string = Buffer.from(randomBytes(32)).toString("base64")
-	
+
 			// state proof key
 			const stateProofKey: string = Buffer.from(randomBytes(64)).toString("base64")
-	
+
 			// create keyreg transaction
 			const txn: KeyregTransaction = withTestTransactionHeader(
 				algorandCrafter
 					.changeOnline(from, voteKey, selectionKey, stateProofKey, 1000, 2000, 32)
 			).get()
-	
+
 			expect(txn).toBeDefined()
 			expect(txn).toBeInstanceOf(KeyregTransaction)
 
@@ -181,12 +181,12 @@ describe("Algorand Transaction Crafter", () => {
 		it("(OK) Craft Keyreg change-offline transaction", async () => {
 			// from algorand address
 			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
-	
+
 			// create keyreg transaction
 			const txn: KeyregTransaction = withTestTransactionHeader(algorandCrafter
 				.changeOffline(from)
 			).get()
-	
+
 			expect(txn).toBeDefined()
 			expect(txn).toBeInstanceOf(KeyregTransaction)
 			expect(txn).toEqual({
@@ -208,16 +208,16 @@ describe("Algorand Transaction Crafter", () => {
 		it("(OK) Craft Keyreg non-participation transaction", async () => {
 			// from algorand address
 			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
-	
+
 			// note
 			const note: string = Buffer.from(randomBytes(32)).toString("base64")
-	
+
 			// create keyreg transaction
 			const txn: KeyregTransaction = withTestTransactionHeader(
 				algorandCrafter
 					.markNonParticipation(from)
 			).get()
-	
+
 			expect(txn).toBeDefined()
 			expect(txn).toBeInstanceOf(KeyregTransaction)
 			expect(txn).toEqual({
