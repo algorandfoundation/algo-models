@@ -10,7 +10,6 @@ import {AssetParamsBuilder} from "./algorand.asset.params";
 import {AssetConfigTransaction} from "./algorand.transaction.acfg";
 import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
 import {AssetTransferTransaction} from "./algorand.transaction.axfer";
-import algosdk from 'algosdk'
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
