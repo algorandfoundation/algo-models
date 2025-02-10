@@ -80,7 +80,7 @@ export class AssetParams {
  */
 export interface IAssetParamsBuilder {
     addTotal(total: number | bigint): IAssetParamsBuilder
-    addDecimals(decimals: number | bigint | bigint): IAssetParamsBuilder
+    addDecimals(decimals: number | bigint): IAssetParamsBuilder
     addDefaultFrozen(frozen: boolean): IAssetParamsBuilder
     addUnitName(unitName: string): IAssetParamsBuilder
     addAssetName(assetName: string): IAssetParamsBuilder
