@@ -42,7 +42,7 @@ describe("Algorand Encoding", () => {
 		// to algorand address
 		const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 
-		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000n, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
+		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
 		const signature: Uint8Array = new Uint8Array(Buffer.from(randomBytes(64)))
 		const signedTransaction: Uint8Array = algorandCrafter.addSignature(encodedTransaction, signature)
 
@@ -105,7 +105,7 @@ describe("Algorand Encoding", () => {
 		const note: string = Buffer.from(randomBytes(32)).toString("base64")
 
 		// create pay transaction
-		const txn: PayTransaction = algorandCrafter.pay(1000n, from, to).addFirstValidRound(1000).addLastValidRound(2000).addNote(note).addFee(1000n).get()
+		const txn: PayTransaction = algorandCrafter.pay(1000, from, to).addFirstValidRound(1000).addLastValidRound(2000).addNote(note).addFee(1000).get()
 
 		const encoded: Uint8Array = txn.encode()
 		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
@@ -133,7 +133,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note)
-			.addFee(1000n)
+			.addFee(1000)
 			.get()
 
 		const encoded: Uint8Array = txn.encode()
@@ -166,7 +166,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000n)
+			.addFee(1000)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)
@@ -191,7 +191,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000n)
+			.addFee(1000)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)
@@ -218,7 +218,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000n)
+			.addFee(1000)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)

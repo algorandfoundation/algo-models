@@ -58,7 +58,7 @@ export interface IAssetTransferTxBuilder extends ITransactionHeaderBuilder<IAsse
      *
      * @param xaid The unique ID of the asset to be transferred.
      */
-    addAssetId(xaid: number): IAssetTransferTxBuilder
+    addAssetId(xaid: number | bigint): IAssetTransferTxBuilder
     /**
      * Add Asset Amount
      *
@@ -106,11 +106,11 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         this.tx.fee = 1000n
     }
     addAssetId(xaid: number | bigint): IAssetTransferTxBuilder {
-        this.tx.xaid = xaid
+        this.tx.xaid = AlgorandEncoder.safeCastBigInt(xaid)
         return this
     }
     addAssetAmount(aamt: number | bigint): IAssetTransferTxBuilder {
-        this.tx.aamt = aamt
+        this.tx.aamt = AlgorandEncoder.safeCastBigInt(aamt)
         return this
     }
     addAssetSender(asnd: string): IAssetTransferTxBuilder {
@@ -129,16 +129,16 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: bigint): IAssetTransferTxBuilder {
-        this.tx.fee = fee
+    addFee(fee: number | bigint): IAssetTransferTxBuilder {
+        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
         return this
     }
-    addFirstValidRound(firstValid: number): IAssetTransferTxBuilder {
-        this.tx.fv = firstValid
+    addFirstValidRound(firstValid: number | bigint): IAssetTransferTxBuilder {
+        this.tx.fv = AlgorandEncoder.safeCastBigInt(firstValid)
         return this
     }
-    addLastValidRound(lastValid: number): IAssetTransferTxBuilder {
-        this.tx.lv = lastValid
+    addLastValidRound(lastValid: number | bigint): IAssetTransferTxBuilder {
+        this.tx.lv = AlgorandEncoder.safeCastBigInt(lastValid)
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetTransferTxBuilder {

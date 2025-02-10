@@ -12,7 +12,7 @@
         "const": "acfg"
       },
       "caid": {
-        "type": "integer",
+        "typeof": "bigint",
         "description": "For re-configure or destroy transactions, this is the unique asset ID. On asset creation, the ID is set to zero."
       },
       "apar": {

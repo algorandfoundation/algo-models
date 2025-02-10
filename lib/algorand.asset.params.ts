@@ -9,14 +9,14 @@ export class AssetParams {
      *
      * The total number of base units of the asset to create. This number cannot be changed.
      */
-    t?: number | bigint | undefined
+    t?: bigint | undefined
     /**
      * Decimals
      *
      * The number of digits to use after the decimal point when displaying the asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in tenths.
      * If 2, the base unit of the asset is in hundredths, if 3, the base unit of the asset is in thousandths, and so on up to 19 decimal places
      */
-    dc?: number | bigint
+    dc?: bigint
     /**
      * Default Frozen
      *
@@ -79,8 +79,8 @@ export class AssetParams {
  * @internal
  */
 export interface IAssetParamsBuilder {
-    addTotal(total: number): IAssetParamsBuilder
-    addDecimals(decimals: number): IAssetParamsBuilder
+    addTotal(total: number | bigint): IAssetParamsBuilder
+    addDecimals(decimals: number | bigint | bigint): IAssetParamsBuilder
     addDefaultFrozen(frozen: boolean): IAssetParamsBuilder
     addUnitName(unitName: string): IAssetParamsBuilder
     addAssetName(assetName: string): IAssetParamsBuilder
@@ -104,12 +104,12 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
         this.encoder = new AlgorandEncoder()
     }
 
-    addTotal(total: number): IAssetParamsBuilder {
-        this.params.t = total
+    addTotal(total: number | bigint): IAssetParamsBuilder {
+        this.params.t = AlgorandEncoder.safeCastBigInt(total)
         return this
     }
-    addDecimals(decimals: number): IAssetParamsBuilder {
-        this.params.dc = decimals
+    addDecimals(decimals: number | bigint): IAssetParamsBuilder {
+        this.params.dc = AlgorandEncoder.safeCastBigInt(decimals)
         return this
     }
     addDefaultFrozen(frozen: boolean): IAssetParamsBuilder {

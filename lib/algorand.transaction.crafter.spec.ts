@@ -79,8 +79,8 @@ describe("Algorand Transaction Crafter", () => {
 			gen: genesisId,
 			gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
 			fee: 1000n,
-			fv: 1000,
-			lv: 2000,
+			fv: 1000n,
+			lv: 2000n,
 			rekey: sender
 		}
 	})
@@ -97,7 +97,7 @@ describe("Algorand Transaction Crafter", () => {
 		// to algorand address
 		const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 
-		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000n, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
+		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
 		const signature: Uint8Array = Buffer.from(randomBytes(64))
 		const result: Uint8Array = algorandCrafter.addSignature(encodedTransaction, signature)
 		expect(result).toBeDefined()
@@ -122,7 +122,7 @@ describe("Algorand Transaction Crafter", () => {
 			// create pay transaction
 			const txn: PayTransaction = withTestTransactionHeader(
 				algorandCrafter
-					.pay(1000n, from, to)
+					.pay(1000, from, to)
 					.addCloseTo(from)
 			).get()
 
@@ -173,9 +173,9 @@ describe("Algorand Transaction Crafter", () => {
 				votekey: new Uint8Array(Buffer.from(voteKey, "base64")),
 				selkey: new Uint8Array(Buffer.from(selectionKey, "base64")),
 				sprfkey: new Uint8Array(Buffer.from(stateProofKey, "base64")),
-				votefst: 1000,
-				votelst: 2000,
-				votekd: 32,
+				votefst: 1000n,
+				votelst: 2000n,
+				votekd: 32n,
 				type: "keyreg",
 				...transactionHeader,
 			})
@@ -296,7 +296,7 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toEqual({
 				type: "acfg",
 				apar: undefined,
-				caid: 1,
+				caid: 1n,
 				...transactionHeader,
 			})
 
@@ -325,7 +325,7 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toEqual({
 				type: "afrz",
 				fadd: algoEncoder.decodeAddress(from),
-				faid: 1,
+				faid: 1n,
 				afrz: true,
 				...transactionHeader,
 			})
@@ -356,8 +356,8 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toBeInstanceOf(AssetTransferTransaction)
 			expect(txn).toEqual({
 				type: "axfer",
-				xaid: 1,
-				aamt: 1,
+				xaid: 1n,
+				aamt: 1n,
 				arcv: algoEncoder.decodeAddress(from),
 				aclose: algoEncoder.decodeAddress(from),
 				asnd: algoEncoder.decodeAddress(from),

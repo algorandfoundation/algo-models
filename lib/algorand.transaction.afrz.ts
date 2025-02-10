@@ -19,7 +19,7 @@ export class AssetFreezeTransaction extends TransactionHeader {
     /**
      * The asset ID being frozen or unfrozen.
      */
-    faid: number | bigint
+    faid: bigint
     /**
      * True to freeze the asset.
      */
@@ -48,7 +48,7 @@ export interface IAssetFreezeTxBuilder extends ITransactionHeaderBuilder<IAssetF
      *
      * @param faid The asset ID being frozen or unfrozen.
      */
-    addFreezeAsset(faid: number): IAssetFreezeTxBuilder
+    addFreezeAsset(faid: number | bigint): IAssetFreezeTxBuilder
     /**
      * Add Asset Frozen
      *
@@ -81,8 +81,8 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         this.tx.fadd = this.encoder.decodeAddress(fadd)
         return this
     }
-    addFreezeAsset(faid: number): IAssetFreezeTxBuilder {
-        this.tx.faid = faid
+    addFreezeAsset(faid: number | bigint): IAssetFreezeTxBuilder {
+        this.tx.faid = AlgorandEncoder.safeCastBigInt(faid)
         return this
     }
     addAssetFrozen(afrz: boolean): IAssetFreezeTxBuilder {
@@ -93,16 +93,16 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: bigint): IAssetFreezeTxBuilder {
-        this.tx.fee = fee
+    addFee(fee: number | bigint): IAssetFreezeTxBuilder {
+        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
         return this
     }
-    addFirstValidRound(firstValid: number): IAssetFreezeTxBuilder {
-        this.tx.fv = firstValid
+    addFirstValidRound(firstValid: number | bigint): IAssetFreezeTxBuilder {
+        this.tx.fv = AlgorandEncoder.safeCastBigInt(firstValid)
         return this
     }
-    addLastValidRound(lastValid: number): IAssetFreezeTxBuilder {
-        this.tx.lv = lastValid
+    addLastValidRound(lastValid: number | bigint): IAssetFreezeTxBuilder {
+        this.tx.lv = AlgorandEncoder.safeCastBigInt(lastValid)
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetFreezeTxBuilder {

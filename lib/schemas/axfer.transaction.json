@@ -12,11 +12,11 @@
         "const": "axfer"
       },
       "xaid": {
-        "type": "integer",
+        "typeof": "bigint",
         "description": "The unique ID of the asset to be transferred."
       },
       "aamt": {
-        "type": "integer",
+        "typeof": "bigint",
         "description": "The amount of the asset to be transferred. A zero amount transferred to self allocates that asset in the account's Asset map."
       },
       "asnd": {

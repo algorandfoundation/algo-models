@@ -15,9 +15,9 @@ export class AssetConfigTransaction extends TransactionHeader {
     declare type: "acfg"
     /**
      * For re-configure or destroy transactions, this is the unique asset ID. On asset creation, the ID is set to zero.
-     * @type {number | bigint}
+     * @type {bigint}
      */
-    caid?: number | bigint
+    caid?: bigint
     /**
      * See {@link AssetParams} for all available fields.
      * @type {AssetParams}
@@ -81,7 +81,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.fee = 1000n
     }
     addAssetId(caid: number | bigint): IAssetConfigTxBuilder {
-        this.tx.caid = caid
+        this.tx.caid = AlgorandEncoder.safeCastBigInt(caid)
         return this
     }
     addAssetParams(params: AssetParams): IAssetConfigTxBuilder{
@@ -92,16 +92,16 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: bigint): IAssetConfigTxBuilder {
-        this.tx.fee = fee
+    addFee(fee: number | bigint): IAssetConfigTxBuilder {
+        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
         return this
     }
-    addFirstValidRound(fv: number): IAssetConfigTxBuilder {
-        this.tx.fv = fv
+    addFirstValidRound(fv: number | bigint): IAssetConfigTxBuilder {
+        this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
         return this
     }
-    addLastValidRound(lv: number): IAssetConfigTxBuilder {
-        this.tx.lv = lv
+    addLastValidRound(lv: number | bigint): IAssetConfigTxBuilder {
+        this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetConfigTxBuilder {
