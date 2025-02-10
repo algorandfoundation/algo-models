@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "fee": {
-      "type": "integer",
+      "typeof": "bigint",
       "description": "Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos."
     },
     "fv": {

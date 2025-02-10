@@ -78,7 +78,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.gen = genesisId
         this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
         this.tx.type = "acfg"
-        this.tx.fee = 1000
+        this.tx.fee = 1000n
     }
     addAssetId(caid: number | bigint): IAssetConfigTxBuilder {
         this.tx.caid = caid
@@ -92,7 +92,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: number): IAssetConfigTxBuilder {
+    addFee(fee: bigint): IAssetConfigTxBuilder {
         this.tx.fee = fee
         return this
     }

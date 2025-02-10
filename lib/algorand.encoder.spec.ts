@@ -10,6 +10,7 @@ import {AssetParamsBuilder} from "./algorand.asset.params";
 import {AssetConfigTransaction} from "./algorand.transaction.acfg";
 import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
 import {AssetTransferTransaction} from "./algorand.transaction.axfer";
+import algosdk from 'algosdk'
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
@@ -42,7 +43,7 @@ describe("Algorand Encoding", () => {
 		// to algorand address
 		const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 
-		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
+		const encodedTransaction: Uint8Array = algorandCrafter.pay(1000n, from, to).addFirstValidRound(1000).addLastValidRound(2000).get().encode()
 		const signature: Uint8Array = new Uint8Array(Buffer.from(randomBytes(64)))
 		const signedTransaction: Uint8Array = algorandCrafter.addSignature(encodedTransaction, signature)
 
@@ -79,7 +80,7 @@ describe("Algorand Encoding", () => {
 			txn: {
 				rcv: algoEncoder.decodeAddress(to),
 				snd: algoEncoder.decodeAddress(from),
-				amt: 1000,
+				amt: 1000n,
 				fv: 1000,
 				lv: 2000,
 				fee: 1000,
@@ -105,7 +106,7 @@ describe("Algorand Encoding", () => {
 		const note: string = Buffer.from(randomBytes(32)).toString("base64")
 
 		// create pay transaction
-		const txn: PayTransaction = algorandCrafter.pay(1000, from, to).addFirstValidRound(1000).addLastValidRound(2000).addNote(note).addFee(1000).get()
+		const txn: PayTransaction = algorandCrafter.pay(1000n, from, to).addFirstValidRound(1000).addLastValidRound(2000).addNote(note).addFee(1000n).get()
 
 		const encoded: Uint8Array = txn.encode()
 		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
@@ -133,7 +134,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note)
-			.addFee(1000)
+			.addFee(1000n)
 			.get()
 
 		const encoded: Uint8Array = txn.encode()
@@ -166,7 +167,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000)
+			.addFee(1000n)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)
@@ -191,7 +192,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000)
+			.addFee(1000n)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)
@@ -218,7 +219,7 @@ describe("Algorand Encoding", () => {
 			.addFirstValidRound(1000)
 			.addLastValidRound(2000)
 			.addNote(note, "base64")
-			.addFee(1000)
+			.addFee(1000n)
 			.addGroup(grp)
 			.addRekey(from)
 			.addLease(lx)

@@ -75,7 +75,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         this.tx.gen = genesisId
         this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
         this.tx.type = "afrz"
-        this.tx.fee = 1000
+        this.tx.fee = 1000n
     }
     addFreezeAccount(fadd: string): IAssetFreezeTxBuilder {
         this.tx.fadd = this.encoder.decodeAddress(fadd)
@@ -93,7 +93,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: number): IAssetFreezeTxBuilder {
+    addFee(fee: bigint): IAssetFreezeTxBuilder {
         this.tx.fee = fee
         return this
     }

@@ -30,7 +30,7 @@ export abstract class TransactionHeader {
      *
      * Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    fee: number
+    fee: bigint
     /**
      * First Valid
      *
@@ -108,7 +108,7 @@ export interface ITransactionHeaderBuilder<T> {
      *
      * @param fee Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    addFee(fee: number): T
+    addFee(fee: bigint): T
 
     /**
      * Add First Valid Round

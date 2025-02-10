@@ -103,7 +103,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         this.tx.gen = genesisId
         this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
         this.tx.type = "axfer"
-        this.tx.fee = 1000
+        this.tx.fee = 1000n
     }
     addAssetId(xaid: number | bigint): IAssetTransferTxBuilder {
         this.tx.xaid = xaid
@@ -129,7 +129,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         this.tx.snd = this.encoder.decodeAddress(sender)
         return this
     }
-    addFee(fee: number): IAssetTransferTxBuilder {
+    addFee(fee: bigint): IAssetTransferTxBuilder {
         this.tx.fee = fee
         return this
     }

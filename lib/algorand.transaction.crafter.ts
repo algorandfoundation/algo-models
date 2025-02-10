@@ -22,7 +22,7 @@ export class AlgorandTransactionCrafter extends Crafter {
 	 * @param from The address of the account that pays the fee and amount.
 	 * @param to The address of the account that receives the amount.
 	 */
-	pay(amount: number, from: string, to: string): IPayTxBuilder {
+	pay(amount: bigint, from: string, to: string): IPayTxBuilder {
 		return new PayTxBuilder(this.genesisId, this.genesisHash).addAmount(amount).addSender(from).addReceiver(to)
 	}
 	/**

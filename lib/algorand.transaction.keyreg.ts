@@ -132,7 +132,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		this.tx.gen = genesisId
 		this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
 		this.tx.type = "keyreg"
-		this.tx.fee = 1000
+		this.tx.fee = 1000n
 	}
 	addVoteKey(voteKey: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
 		this.tx.votekey = new Uint8Array(Buffer.from(voteKey, encoding))
@@ -166,7 +166,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		this.tx.snd = this.encoder.decodeAddress(sender)
 		return this
 	}
-	addFee(fee: number): IKeyregTxBuilder {
+	addFee(fee: bigint): IKeyregTxBuilder {
 		this.tx.fee = fee
 		return this
 	}
