@@ -22,7 +22,7 @@ export class AlgorandTransactionCrafter extends Crafter {
 	 * @param from The address of the account that pays the fee and amount.
 	 * @param to The address of the account that receives the amount.
 	 */
-	pay(amount: number, from: string, to: string): IPayTxBuilder {
+	pay(amount: number | bigint, from: string, to: string): IPayTxBuilder {
 		return new PayTxBuilder(this.genesisId, this.genesisHash).addAmount(amount).addSender(from).addReceiver(to)
 	}
 	/**
@@ -36,7 +36,7 @@ export class AlgorandTransactionCrafter extends Crafter {
 	 * @param voteLast The last round that the participation key is valid.
 	 * @param voteKeyDilution This is the dilution for the 2-level participation key.
 	 */
-	changeOnline(from: string, voteKey: string, selectionKey: string, stateProofKey: string, voteFirst: number, voteLast: number, voteKeyDilution: number): IKeyregTxBuilder {
+	changeOnline(from: string, voteKey: string, selectionKey: string, stateProofKey: string, voteFirst: number | bigint, voteLast: number | bigint, voteKeyDilution: number | bigint): IKeyregTxBuilder {
 		return new KeyregTxBuilder(this.genesisId, this.genesisHash)
 			.addSender(from)
 			.addVoteKey(voteKey)
@@ -94,7 +94,7 @@ export class AlgorandTransactionCrafter extends Crafter {
 	 * @param faid The asset ID being frozen or unfrozen.
 	 * @param afrz True to freeze the asset.
 	 */
-	freezeAsset(fadd: string, faid: number, afrz: boolean): IAssetFreezeTxBuilder {
+	freezeAsset(fadd: string, faid: number | bigint, afrz: boolean): IAssetFreezeTxBuilder {
 		return new AssetFreezeTxBuilder(this.genesisId, this.genesisHash)
 			.addFreezeAccount(fadd)
 			.addFreezeAsset(faid)
@@ -108,7 +108,7 @@ export class AlgorandTransactionCrafter extends Crafter {
 	 * @param arcv The recipient of the asset transfer.
 	 * @param aamt The amount of the asset to be transferred.
 	 */
-	transferAsset(from: string, xaid: number, arcv: string, aamt: number | bigint): IAssetTransferTxBuilder {
+	transferAsset(from: string, xaid: number | bigint, arcv: string, aamt: number | bigint): IAssetTransferTxBuilder {
 		return new AssetTransferTxBuilder(this.genesisId, this.genesisHash)
 			.addSender(from)
 			.addAssetId(xaid)

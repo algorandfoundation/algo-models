@@ -16,7 +16,7 @@
         "description": "The address of the account whose asset is being frozen or unfrozen."
       },
       "faid": {
-        "type": "integer",
+        "typeof": "bigint",
         "description": "The asset ID being frozen or unfrozen."
       },
       "afrz": {

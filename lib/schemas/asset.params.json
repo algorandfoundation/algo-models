@@ -5,11 +5,11 @@
   "type": "object",
   "properties": {
     "t": {
-      "type": "integer",
+      "typeof": "bigint",
       "description": "The total number of base units of the asset to create. This number cannot be changed."
     },
     "dc": {
-      "type": "integer",
+      "typeof": "bigint",
       "description": "The number of digits to use after the decimal point when displaying the asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in tenths. If 2, the base unit of the asset is in hundredths, if 3, the base unit of the asset is in thousandths, and so on up to 19 decimal places"
     },
     "df": {

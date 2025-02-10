@@ -33,21 +33,21 @@ export class KeyregTransaction extends TransactionHeader {
 	 *
 	 * The first round that the participation key is valid. Not to be confused with the FirstValid round of the keyreg transaction.
 	 */
-	votefst?: number
+	votefst?: bigint
 	/**
 	 * Vote Last
 	 *
 	 * The last round that the participation key is valid.
 	 * Not to be confused with the LastValid round of the keyreg transaction.
 	 */
-	votelst?: number
+	votelst?: bigint
 	/**
 	 * Vote Key Dilution
 	 *
 	 * This is the dilution for the 2-level participation key.
 	 * It determines the interval (number of rounds) for generating new ephemeral keys.
 	 */
-	votekd?: number
+	votekd?: bigint
 	/**
 	 * Nonparticipating
 	 *
@@ -95,19 +95,19 @@ export interface IKeyregTxBuilder extends ITransactionHeaderBuilder<IKeyregTxBui
 	 *
 	 * @param voteFirst The first round that the participation key is valid.
 	 */
-	addVoteFirst(voteFirst: number): IKeyregTxBuilder
+	addVoteFirst(voteFirst: number | bigint): IKeyregTxBuilder
 	/**
 	 * Add Vote Last
 	 *
 	 * @param voteLast The last round that the participation key is valid.
 	 */
-	addVoteLast(voteLast: number): IKeyregTxBuilder
+	addVoteLast(voteLast: number | bigint): IKeyregTxBuilder
 	/**
 	 * Add Dilution
 	 *
 	 * @param voteKeyDilution This is the dilution for the 2-level participation key.
 	 */
-	addVoteKeyDilution(voteKeyDilution: number): IKeyregTxBuilder
+	addVoteKeyDilution(voteKeyDilution: number | bigint): IKeyregTxBuilder
 	/**
 	 * Add Non-Participating
 	 *
@@ -132,7 +132,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		this.tx.gen = genesisId
 		this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
 		this.tx.type = "keyreg"
-		this.tx.fee = 1000
+		this.tx.fee = 1000n
 	}
 	addVoteKey(voteKey: string, encoding: BufferEncoding = "base64"): IKeyregTxBuilder {
 		this.tx.votekey = new Uint8Array(Buffer.from(voteKey, encoding))
@@ -146,16 +146,16 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		this.tx.sprfkey = new Uint8Array(Buffer.from(stateProofKey, encoding))
 		return this
 	}
-	addVoteFirst(voteFirst: number): IKeyregTxBuilder {
-		this.tx.votefst = voteFirst
+	addVoteFirst(voteFirst: number | bigint): IKeyregTxBuilder {
+		this.tx.votefst = AlgorandEncoder.safeCastBigInt(voteFirst)
 		return this
 	}
-	addVoteLast(voteLast: number): IKeyregTxBuilder {
-		this.tx.votelst = voteLast
+	addVoteLast(voteLast: number | bigint): IKeyregTxBuilder {
+		this.tx.votelst = AlgorandEncoder.safeCastBigInt(voteLast)
 		return this
 	}
-	addVoteKeyDilution(voteKeyDilution: number): IKeyregTxBuilder {
-		this.tx.votekd = voteKeyDilution
+	addVoteKeyDilution(voteKeyDilution: number | bigint): IKeyregTxBuilder {
+		this.tx.votekd = AlgorandEncoder.safeCastBigInt(voteKeyDilution)
 		return this
 	}
 	addNonParticipation(nonParticipation: boolean): IKeyregTxBuilder {
@@ -166,16 +166,16 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		this.tx.snd = this.encoder.decodeAddress(sender)
 		return this
 	}
-	addFee(fee: number): IKeyregTxBuilder {
-		this.tx.fee = fee
+	addFee(fee: number | bigint): IKeyregTxBuilder {
+		this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
 		return this
 	}
-	addFirstValidRound(fv: number): IKeyregTxBuilder {
-		this.tx.fv = fv
+	addFirstValidRound(fv: number | bigint): IKeyregTxBuilder {
+		this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
 		return this
 	}
-	addLastValidRound(lv: number): IKeyregTxBuilder {
-		this.tx.lv = lv
+	addLastValidRound(lv: number | bigint): IKeyregTxBuilder {
+		this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IKeyregTxBuilder {

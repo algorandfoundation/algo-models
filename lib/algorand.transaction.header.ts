@@ -30,19 +30,19 @@ export abstract class TransactionHeader {
      *
      * Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    fee: number
+    fee: bigint
     /**
      * First Valid
      *
      * The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network.
      */
-    fv: number
+    fv: bigint
     /**
      * Last Valid
      *
      * The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network.
      */
-    lv: number
+    lv: bigint
     /**
      * Genesis Hash
      *
@@ -108,21 +108,21 @@ export interface ITransactionHeaderBuilder<T> {
      *
      * @param fee Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    addFee(fee: number): T
+    addFee(fee: number | bigint): T
 
     /**
      * Add First Valid Round
      *
      * @param fv The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network.
      */
-    addFirstValidRound(fv: number): T
+    addFirstValidRound(fv: number | bigint): T
 
     /**
      * Add Last Valid Round
      *
      * @param lv The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network.
      */
-    addLastValidRound(lv: number): T
+    addLastValidRound(lv: number | bigint): T
 
     /**
      * Add Note

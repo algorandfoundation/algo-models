@@ -21,7 +21,7 @@ export class PayTransaction extends TransactionHeader {
 	 *
 	 * The total amount to be sent in microAlgos.
 	 */
-	amt: number
+	amt: bigint
 
 	/**
 	 * Close Remainder To
@@ -54,7 +54,7 @@ export interface IPayTxBuilder extends ITransactionHeaderBuilder<IPayTxBuilder>{
 	 *
 	 * @param amount The total amount to be sent in microAlgos.
 	 */
-	addAmount(amount: number): IPayTxBuilder
+	addAmount(amount: number | bigint): IPayTxBuilder
 	/**
 	 * Add Close Remainder To
 	 *
@@ -77,14 +77,14 @@ export class PayTxBuilder implements IPayTxBuilder {
 		this.tx.gen = genesisId
 		this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
 		this.tx.type = "pay"
-		this.tx.fee = 1000
+		this.tx.fee = 1000n
 	}
 	addReceiver(receiver: string): IPayTxBuilder {
 		this.tx.rcv = this.encoder.decodeAddress(receiver)
 		return this
 	}
-	addAmount(amount: number): IPayTxBuilder {
-		this.tx.amt = amount
+	addAmount(amount: number | bigint): IPayTxBuilder {
+		this.tx.amt = AlgorandEncoder.safeCastBigInt(amount)
 		return this
 	}
 	addCloseTo(close: string): IPayTxBuilder {
@@ -95,16 +95,16 @@ export class PayTxBuilder implements IPayTxBuilder {
 		this.tx.snd = this.encoder.decodeAddress(sender)
 		return this
 	}
-	addFee(fee: number): IPayTxBuilder {
-		this.tx.fee = fee
+	addFee(fee: number | bigint): IPayTxBuilder {
+		this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
 		return this
 	}
-	addFirstValidRound(fv: number): IPayTxBuilder {
-		this.tx.fv = fv
+	addFirstValidRound(fv: number | bigint): IPayTxBuilder {
+		this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
 		return this
 	}
-	addLastValidRound(lv: number): IPayTxBuilder {
-		this.tx.lv = lv
+	addLastValidRound(lv: number | bigint): IPayTxBuilder {
+		this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IPayTxBuilder {

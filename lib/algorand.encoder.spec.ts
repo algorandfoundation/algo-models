@@ -79,7 +79,7 @@ describe("Algorand Encoding", () => {
 			txn: {
 				rcv: algoEncoder.decodeAddress(to),
 				snd: algoEncoder.decodeAddress(from),
-				amt: 1000,
+				amt: 1000n,
 				fv: 1000,
 				lv: 2000,
 				fee: 1000,
