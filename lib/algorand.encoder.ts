@@ -119,7 +119,7 @@ export class AlgorandEncoder extends Encoder{
 	 */
 	static safeCastBigInt(value: number | bigint): bigint {
 		const bigIntValue = BigInt(value)
-		if (bigIntValue < Number.MIN_SAFE_INTEGER || bigIntValue > Number.MAX_SAFE_INTEGER) {
+if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
 			throw new Error("Value is not within the safe integer range")
 		}
 		return bigIntValue
