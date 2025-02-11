@@ -37,3 +37,13 @@ jobs:
           from_branch: release/1.x
           target_branch: main
           github_token: ${{ steps.app-token.outputs.token }}
+      - name: Build documentation
+        run: npm run typedoc
+      - name: Publish to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: |
+            pages deploy docs --project-name ${{ secrets.CF_PROJECT_NAME }}
