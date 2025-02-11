@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/axfer.transaction.json",
+  "title": "Asset Transfer Transaction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "http://algo-models.com/schemas/transaction.header.json"},
+    {
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "axfer"
+      },
+      "xaid": {
+        "typeof": "bigint",
+        "description": "The unique ID of the asset to be transferred."
+      },
+      "aamt": {
+        "typeof": "bigint",
+        "description": "The amount of the asset to be transferred. A zero amount transferred to self allocates that asset in the account's Asset map."
+      },
+      "asnd": {
+        "$ref": "http://algo-models.com/schemas/bytes32.json",
+        "description": "The sender of the transfer. The regular sender field should be used and this one set to the zero value for regular transfers between accounts. If this value is nonzero, it indicates a clawback transaction where the sender is the asset's clawback address and the asset sender is the address from which the funds will be withdrawn."
+      },
+      "arcv": {
+        "$ref": "http://algo-models.com/schemas/bytes32.json",
+        "description": "The recipient of the asset transfer."
+      },
+      "aclose": {
+        "$ref": "http://algo-models.com/schemas/bytes32.json",
+        "description": "Specify this field to remove the asset holding from the sender account and reduce the account's minimum balance (i.e. opt-out of the asset)."
+      }
+    },
+      "required": ["type", "xaid", "aamt", "arcv"]
+  }]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/afrz.transaction.json",
+  "title": "Asset Freeze Transaction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "http://algo-models.com/schemas/transaction.header.json"},
+    {
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "afrz"
+      },
+      "fadd": {
+        "$ref": "http://algo-models.com/schemas/bytes32.json",
+        "description": "The address of the account whose asset is being frozen or unfrozen."
+      },
+      "faid": {
+        "typeof": "bigint",
+        "description": "The asset ID being frozen or unfrozen."
+      },
+      "afrz": {
+        "type": "boolean",
+        "description": "True to freeze the asset."
+      }
+    },
+      "required": ["fadd", "faid", "afrz"]
+  }]
+}

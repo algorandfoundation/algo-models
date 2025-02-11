@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/transaction.header.json",
+  "title": "Transaction Header",
+  "type": "object",
+  "properties": {
+    "fee": {
+      "typeof": "bigint",
+      "description": "Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos."
+    },
+    "fv": {
+      "typeof": "bigint",
+      "description": "The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network."
+    },
+    "gh": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json",
+      "description": "The hash of the genesis block of the network for which the transaction is valid. See the genesis hash for MainNet, TestNet, and BetaNet."
+    },
+    "lv": {
+      "typeof": "bigint",
+      "description": "The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network."
+    },
+    "snd": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json",
+      "description": "The address of the account that pays the fee and amount."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["pay", "keyreg", "acfg", "axfer", "afrz", "appl", "stpf"],
+      "description": "Specifies the type of transaction. This value is automatically generated using any of the developer tools."
+    },
+    "gen": {
+      "type": "string",
+      "description": "The human-readable string that identifies the network for the transaction. The genesis ID is found in the genesis block. See the genesis ID for MainNet, TestNet, and BetaNet."
+    },
+    "grp": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json",
+      "description": "The group specifies that the transaction is part of a group and, if so, specifies the hash of the transaction group. Assign a group ID to a transaction through the workflow described in the Atomic Transfers Guide."
+    },
+    "lx": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json",
+      "description": "A lease enforces mutual exclusion of transactions. If this field is nonzero, then once the transaction is confirmed, it acquires the lease identified by the (Sender, Lease) pair of the transaction until the LastValid round passes. While this transaction possesses the lease, no other transaction specifying this lease can be confirmed. A lease is often used in the context of Algorand Smart Contracts to prevent replay attacks. Read more about Algorand Smart Contracts. Leases can also be used to safeguard against unintended duplicate spends. For example, if I send a transaction to the network and later realize my fee was too low, I could send another transaction with a higher fee, but the same lease value. This would ensure that only one of those transactions ends up getting confirmed during the validity period."
+    },
+    "note": {
+      "type": "object",
+      "description": "Any data up to 1000 bytes."
+    },
+    "rekey": {
+      "$ref": "http://algo-models.com/schemas/bytes32.json",
+      "description": "Specifies the authorized address. This address will be used to authorize all future transactions."
+    }
+  },
+  "required": ["fee", "fv", "gh", "lv", "snd", "type"]
+}

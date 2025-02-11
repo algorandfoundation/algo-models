@@ -1,83 +1,128 @@
-import { AlgorandEncoder } from "./algorand.encoder.js"
+import {AlgorandEncoder} from "./algorand.encoder.js"
+import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
 
-export class PayTransaction {
-	type: string
-	snd: Uint8Array
+/**
+ * @category Transactions
+ * @see {@link AlgorandTransactionCrafter}
+ * @see {@link PayTxBuilder}
+ * @example // Manual
+ * const txn = new PayTransaction()
+ */
+export class PayTransaction extends TransactionHeader {
+	declare type: "pay"
+	/**
+	 * Receiver
+	 *
+	 * The address of the account that receives the amount.
+	 */
 	rcv: Uint8Array
-	amt: number
-	fee: number
-	fv: number
-	lv: number
-	note?: Uint8Array
-	gen: string
-	gh: Uint8Array
+	/**
+	 * Amount
+	 *
+	 * The total amount to be sent in microAlgos.
+	 */
+	amt: bigint
+
+	/**
+	 * Close Remainder To
+	 *
+	 * When set, it indicates that the transaction is requesting that the Sender account should be closed,
+	 * and all remaining funds, after the fee and amount are paid, be transferred to this address.
+	 */
+	close?: Uint8Array
 
 	// encode the transaction
 	// return the encoded transaction
 	encode(): Uint8Array {
-		const encoded: Uint8Array = new AlgorandEncoder().encodeTransaction(this)
-		return encoded
+		return new AlgorandEncoder().encodeTransaction(this)
 	}
 }
 
-export interface IPayTxBuilder {
-	addSender(sender: string): IPayTxBuilder
+/**
+ * @category Builders
+ * @internal
+ */
+export interface IPayTxBuilder extends ITransactionHeaderBuilder<IPayTxBuilder>{
+	/**
+	 * Add Receiver
+	 *
+	 * @param receiver The address of the account that receives the amount.
+	 */
 	addReceiver(receiver: string): IPayTxBuilder
-	addAmount(amount: number): IPayTxBuilder
-	addFee(fee: number): IPayTxBuilder
-	addFirstValidRound(firstValid: number): IPayTxBuilder
-	addLastValidRound(lastValid: number): IPayTxBuilder
-	addNote(note: string, encoding?: BufferEncoding): IPayTxBuilder
-
+	/**
+	 * Add Amount
+	 *
+	 * @param amount The total amount to be sent in microAlgos.
+	 */
+	addAmount(amount: number | bigint): IPayTxBuilder
+	/**
+	 * Add Close Remainder To
+	 *
+	 * @param close Indicates that the transaction is requesting that the Sender account should be closed.
+	 */
+	addCloseTo(close: string): IPayTxBuilder
 	get(): PayTransaction
 }
-
+/**
+ * @category Builders
+ */
 export class PayTxBuilder implements IPayTxBuilder {
-	private tx: PayTransaction
+	private readonly tx: PayTransaction
+	private readonly encoder: AlgorandEncoder
 
 	constructor(genesisId: string, genesisHash: string) {
+		this.encoder = new AlgorandEncoder()
+
 		this.tx = new PayTransaction()
 		this.tx.gen = genesisId
 		this.tx.gh = new Uint8Array(Buffer.from(genesisHash, "base64"))
 		this.tx.type = "pay"
-		this.tx.fee = 1000
+		this.tx.fee = 1000n
 	}
-
-	addSender(sender: string): IPayTxBuilder {
-		this.tx.snd = new AlgorandEncoder().decodeAddress(sender)
-		return this
-	}
-
 	addReceiver(receiver: string): IPayTxBuilder {
-		this.tx.rcv = new AlgorandEncoder().decodeAddress(receiver)
+		this.tx.rcv = this.encoder.decodeAddress(receiver)
 		return this
 	}
-
-	addAmount(amount: number): IPayTxBuilder {
-		this.tx.amt = amount
+	addAmount(amount: number | bigint): IPayTxBuilder {
+		this.tx.amt = AlgorandEncoder.safeCastBigInt(amount)
 		return this
 	}
-
-	addFee(fee: number): IPayTxBuilder {
-		this.tx.fee = fee
+	addCloseTo(close: string): IPayTxBuilder {
+		this.tx.close = this.encoder.decodeAddress(close)
 		return this
 	}
-
-	addFirstValidRound(firstValid: number): IPayTxBuilder {
-		this.tx.fv = firstValid
+	addSender(sender: string): IPayTxBuilder {
+		this.tx.snd = this.encoder.decodeAddress(sender)
 		return this
 	}
-
-	addLastValidRound(lastValid: number): IPayTxBuilder {
-		this.tx.lv = lastValid
+	addFee(fee: number | bigint): IPayTxBuilder {
+		this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
 		return this
 	}
-
+	addFirstValidRound(fv: number | bigint): IPayTxBuilder {
+		this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
+		return this
+	}
+	addLastValidRound(lv: number | bigint): IPayTxBuilder {
+		this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
+		return this
+	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IPayTxBuilder {
 		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
 		return this
 	}
-
+	addRekey(rekey: string): IPayTxBuilder {
+		this.tx.rekey = this.encoder.decodeAddress(rekey)
+		return this
+	}
+	addLease(lx: Uint8Array): IPayTxBuilder {
+		this.tx.lx = lx
+		return this
+	}
+	addGroup(grp: Uint8Array): IPayTxBuilder {
+		this.tx.grp = grp
+		return this
+	}
 	get(): PayTransaction {
 		return this.tx
 	}

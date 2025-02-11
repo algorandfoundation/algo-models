@@ -1,10 +1,9 @@
 name: Release
 on:
   push:
-    branches: [main, develop]
-  workflow_dispatch:
+    branches: ['main', 'release/*']
 jobs:
-  release:
+  npm-publish:
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -13,22 +12,28 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/create-github-app-token@v1
+        id: app-token
         with:
-          node-version: '18.x'
-          registry-url: 'https://npm.pkg.github.com'
-      - run: npm ci
+          app-id: ${{ secrets.BOT_ID }}
+          private-key: ${{ secrets.BOT_SK }}
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - run: npm install
       - run: npm run release
         env:
-          NPM_CONFIG_REGISTRY: 'https://npm.pkg.github.com'
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Merge main -> develop
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Merge Release -> Trunk
         uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/release/1.x'
         with:
           type: now
-          from_branch: main
-          target_branch: develop
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          from_branch: release/1.x
+          target_branch: main
+          github_token: ${{ steps.app-token.outputs.token }}

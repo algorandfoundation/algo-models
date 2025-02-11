@@ -10,9 +10,18 @@ const ALGORAND_ADDRESS_BYTE_LENGTH = 36
 const ALGORAND_CHECKSUM_BYTE_LENGTH = 4
 const ALGORAND_ADDRESS_LENGTH = 58
 const HASH_BYTES_LENGTH = 32
+/**
+ * @internal
+ */
 export const MALFORMED_ADDRESS_ERROR_MSG = "Malformed address"
+/**
+ * @internal
+ */
 export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 
+/**
+ * @category Encoding
+ */
 export class AlgorandEncoder extends Encoder{
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
@@ -100,5 +109,19 @@ export class AlgorandEncoder extends Encoder{
 	decodeSignedTransaction(encoded: Uint8Array): object | Error {
 		const decoded: object = msgpack.decode(encoded) as object
 		return decoded as object
+	}
+
+	/**
+	 * Casts a number or bigint to BigInt and checks if it's within the safe integer range.
+	 * @param value - The number or bigint to be casted.
+	 * @returns The value as a BigInt.
+	 * @throws Error if the value is not within the safe integer range.
+	 */
+	static safeCastBigInt(value: number | bigint): bigint {
+		const bigIntValue = BigInt(value)
+if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
+			throw new Error("Value is not within the safe integer range")
+		}
+		return bigIntValue
 	}
 }

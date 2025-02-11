@@ -1,0 +1,8 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Algorand Models",
+  "customFooterHtml": "Copyright <strong>Algorand Foundation</strong> 2024",
+  "hideGenerator": true,
+  "excludeInternal": true,
+  "entryPoints": ["./lib/index.ts"]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/acfg.transaction.json",
+  "title": "Asset Configuration Transaction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "http://algo-models.com/schemas/transaction.header.json"},
+    {
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "acfg"
+      },
+      "caid": {
+        "typeof": "bigint",
+        "description": "For re-configure or destroy transactions, this is the unique asset ID. On asset creation, the ID is set to zero."
+      },
+      "apar": {
+        "$ref": "http://algo-models.com/schemas/asset.params.json",
+        "description": "Asset Parameters"
+      }
+    }
+  }]
+}
