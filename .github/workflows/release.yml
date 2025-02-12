@@ -1,0 +1,49 @@
+name: Release
+on:
+  push:
+    branches: ['main', 'release/*']
+jobs:
+  npm-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+      packages: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_ID }}
+          private-key: ${{ secrets.BOT_SK }}
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - run: npm install
+      - run: npm run release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Merge Release -> Trunk
+        uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f
+        if: github.ref == 'refs/heads/release/1.x'
+        with:
+          type: now
+          from_branch: release/1.x
+          target_branch: main
+          github_token: ${{ steps.app-token.outputs.token }}
+      - name: Build documentation
+        run: npm run typedoc
+      - name: Publish to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: |
+            pages deploy docs --project-name ${{ secrets.CF_PROJECT_NAME }}
