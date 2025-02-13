@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "preserveValueImports": true,
     "isolatedModules": false,
     "declarationDir": "dist/types",
     "outDir": "dist/esm",
