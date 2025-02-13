@@ -140,4 +140,18 @@ export class AlgorandEncoder extends Encoder{
 		// return sha512_256 hash
 		return Uint8Array.from(sha512_256.array(concatTagList))
 	}
+
+	/**
+	 * Casts a number or bigint to BigInt and checks if it's within the safe integer range.
+	 * @param value - The number or bigint to be casted.
+	 * @returns The value as a BigInt.
+	 * @throws Error if the value is not within the safe integer range.
+	 */
+	static safeCastBigInt(value: number | bigint): bigint {
+		const bigIntValue = BigInt(value)
+if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
+			throw new Error("Value is not within the safe integer range")
+		}
+		return bigIntValue
+	}
 }

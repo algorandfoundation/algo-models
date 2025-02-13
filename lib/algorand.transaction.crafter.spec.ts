@@ -5,6 +5,8 @@ import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
 import Ajv, {type JSONSchemaType} from "ajv"
+import addFormat from 'ajv-formats'
+import addKeywords from 'ajv-keywords'
 import path from "path"
 import fs from 'fs'
 import {AssetConfigTransaction} from "./algorand.transaction.acfg";
@@ -16,25 +18,29 @@ import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transacti
 
 // Setup Validator
 const ajv = new Ajv()
+addFormat(ajv)
+
+// Define the custom keyword 'typeof'
+ajv.addKeyword({
+	keyword: 'typeof',
+	validate: function(schema: string, data: any) {
+	  if (schema === 'bigint') {
+		return typeof data === 'bigint';
+	  }
+	  
+	  console.log("Unknown type: ", schema)
+
+	  // Add more types as needed
+	  return false;
+	},
+	errors: false
+  });
+
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/bytes32.json"), "utf8")))
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/bytes64.json"), "utf8")))
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/transaction.header.json"), "utf8")))
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/asset.params.json"), "utf8")))
 
-
-type TestTransactionHeader = {
-	snd: Uint8Array,
-	note: Uint8Array,
-	grp: Uint8Array,
-	lx: Uint8Array,
-
-	gen: string
-	gh: Uint8Array
-	fee: number
-	fv: number
-	lv: number
-	rekey: Uint8Array
-}
 
 describe("Algorand Transaction Crafter", () => {
 	let algorandCrafter: AlgorandTransactionCrafter
@@ -59,6 +65,7 @@ describe("Algorand Transaction Crafter", () => {
 			.addRekey(algoEncoder.encodeAddress(Buffer.from(snd)))
 			.addLease(lx!!)
 	}
+
 	beforeEach(async () => {
 		algorandCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
 		algoEncoder = new AlgorandEncoder()
@@ -71,9 +78,9 @@ describe("Algorand Transaction Crafter", () => {
 			lx: randomBytes(32),
 			gen: genesisId,
 			gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
-			fee: 1000,
-			fv: 1000,
-			lv: 2000,
+			fee: 1000n,
+			fv: 1000n,
+			lv: 2000n,
 			rekey: sender
 		}
 	})
@@ -124,7 +131,7 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toEqual({
 				rcv: algoEncoder.decodeAddress(to),
 				type: "pay",
-				amt: 1000,
+				amt: 1000n,
 				close: algoEncoder.decodeAddress(from),
 				...transactionHeader,
 			})
@@ -166,9 +173,9 @@ describe("Algorand Transaction Crafter", () => {
 				votekey: new Uint8Array(Buffer.from(voteKey, "base64")),
 				selkey: new Uint8Array(Buffer.from(selectionKey, "base64")),
 				sprfkey: new Uint8Array(Buffer.from(stateProofKey, "base64")),
-				votefst: 1000,
-				votelst: 2000,
-				votekd: 32,
+				votefst: 1000n,
+				votelst: 2000n,
+				votekd: 32n,
 				type: "keyreg",
 				...transactionHeader,
 			})
@@ -289,7 +296,7 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toEqual({
 				type: "acfg",
 				apar: undefined,
-				caid: 1,
+				caid: 1n,
 				...transactionHeader,
 			})
 
@@ -318,7 +325,7 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toEqual({
 				type: "afrz",
 				fadd: algoEncoder.decodeAddress(from),
-				faid: 1,
+				faid: 1n,
 				afrz: true,
 				...transactionHeader,
 			})
@@ -349,8 +356,8 @@ describe("Algorand Transaction Crafter", () => {
 			expect(txn).toBeInstanceOf(AssetTransferTransaction)
 			expect(txn).toEqual({
 				type: "axfer",
-				xaid: 1,
-				aamt: 1,
+				xaid: 1n,
+				aamt: 1n,
 				arcv: algoEncoder.decodeAddress(from),
 				aclose: algoEncoder.decodeAddress(from),
 				asnd: algoEncoder.decodeAddress(from),

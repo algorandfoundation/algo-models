@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/cjs",
     "module": "commonjs",
-    "target": "es5",
+    "target": "ES2020",
     "declaration": false
   },
   "extends": "./tsconfig.json"

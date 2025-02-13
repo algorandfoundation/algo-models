@@ -12,7 +12,7 @@
           "const": "pay"
         },
         "amt": {
-          "type": "integer",
+          "typeof": "bigint",
           "description": "The total amount to be sent in microAlgos."
         },
         "rcv": {

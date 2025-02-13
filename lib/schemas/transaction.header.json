@@ -5,12 +5,11 @@
   "type": "object",
   "properties": {
     "fee": {
-      "type": "integer",
+      "typeof": "bigint",
       "description": "Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos."
     },
     "fv": {
-      "type": "integer",
-      "minimum": 0,
+      "typeof": "bigint",
       "description": "The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network."
     },
     "gh": {
@@ -18,8 +17,7 @@
       "description": "The hash of the genesis block of the network for which the transaction is valid. See the genesis hash for MainNet, TestNet, and BetaNet."
     },
     "lv": {
-      "type": "integer",
-      "minimum": 0,
+      "typeof": "bigint",
       "description": "The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network."
     },
     "snd": {
