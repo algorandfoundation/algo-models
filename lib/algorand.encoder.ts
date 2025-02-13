@@ -1,9 +1,8 @@
 import { sha512_256 } from "js-sha512"
 import * as msgpack from "algo-msgpack-with-bigint"
 import base32 from "hi-base32"
-import { PayTransaction } from "./algorand.transaction.pay.js"
 import { Encoder } from "./encoder.role.js"
-import { KeyregTransaction } from "./algorand.transaction.keyreg.js"
+import { SignedTransaction, Transaction } from "./algorand.transaction.js"
 
 const ALGORAND_PUBLIC_KEY_BYTE_LENGTH = 32
 const ALGORAND_ADDRESS_BYTE_LENGTH = 36
@@ -74,7 +73,7 @@ export class AlgorandEncoder extends Encoder{
 	 *
 	 * @param tx
 	 */
-	encodeTransaction(tx: any): Uint8Array {
+	encodeTransaction(tx: Transaction): Uint8Array {
 		// [TAG] [AMT] .... [NOTE] [RCV] [SND] [] [TYPE]
 		const encoded: Uint8Array = msgpack.encode(tx, { sortKeys: true, ignoreUndefined: true })
 
@@ -92,13 +91,13 @@ export class AlgorandEncoder extends Encoder{
 	 * @param encoded
 	 * @returns
 	 */
-	decodeTransaction(encoded: Uint8Array): object | Error {
+	decodeTransaction(encoded: Uint8Array): Transaction {
 		const TAG: Buffer = Buffer.from("TX")
 		const tagBytes: number = TAG.byteLength
 
 		// remove tag Bytes for the tag and decode the rest
 		const decoded: object = msgpack.decode(encoded.slice(tagBytes)) as object
-		return decoded as PayTransaction | KeyregTransaction
+		return decoded as Transaction
 	}
 
 	/**
@@ -106,8 +105,39 @@ export class AlgorandEncoder extends Encoder{
 	 * @param encoded
 	 * @returns
 	 */
-	decodeSignedTransaction(encoded: Uint8Array): object | Error {
-		const decoded: object = msgpack.decode(encoded) as object
-		return decoded as object
+	decodeSignedTransaction(encoded: Uint8Array): SignedTransaction {
+		const decoded: SignedTransaction = msgpack.decode(encoded) as SignedTransaction
+		return decoded
+	}
+
+	// calculate group id
+	computeGroupId(txns: Uint8Array[]): Uint8Array {
+		// ensure nr of txns in group are between 0 and 16
+		if (txns.length < 1 || txns.length > 16) throw new Error("Invalid number of transactions in group")
+		
+		
+		const hashes: Uint8Array[] = txns.map(txn => { 
+			let encoded: Uint8Array
+
+			try {
+				// verify if it includes signature
+				const decodedTxn: SignedTransaction = this.decodeSignedTransaction(txn)
+				encoded = this.encodeTransaction(decodedTxn.txn)
+			} catch (error) {
+				// txn is already without signature, proceed without further processing
+				encoded = txn
+			}
+
+			return Uint8Array.from(sha512_256.array(encoded))
+		})
+
+		// encode { txList: [tx1, tx2, ...] } with msgpack
+		const encodedTxList: Uint8Array = msgpack.encode({ txlist: hashes }, { sortKeys: true, ignoreUndefined: true }) 
+		
+		// Concat group tag + encoded
+		const concatTagList: Uint8Array = Encoder.ConcatArrays(Buffer.from("TG"), encodedTxList)
+
+		// return sha512_256 hash
+		return Uint8Array.from(sha512_256.array(concatTagList))
 	}
 }

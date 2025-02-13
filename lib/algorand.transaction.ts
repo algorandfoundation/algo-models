@@ -12,3 +12,16 @@ import {KeyregTransaction} from "./algorand.transaction.keyreg.js";
  * @category Common
  */
 export type Transaction = PayTransaction | AssetConfigTransaction | AssetTransferTransaction | AssetFreezeTransaction | KeyregTransaction
+
+// SignedTransaction
+export interface SignedTransaction {
+    /**
+     * Transaction
+     */
+    txn: Transaction
+
+    /**
+     * Transaction Signature
+     */
+    sig: Uint8Array
+}

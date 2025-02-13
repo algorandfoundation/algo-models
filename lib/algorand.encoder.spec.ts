@@ -1,4 +1,3 @@
-import { type SignKeyPair, randomBytes } from "tweetnacl"
 import { sha512_256 } from "js-sha512"
 import base32 from "hi-base32"
 import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"
@@ -10,6 +9,10 @@ import {AssetParamsBuilder} from "./algorand.asset.params";
 import {AssetConfigTransaction} from "./algorand.transaction.acfg";
 import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
 import {AssetTransferTransaction} from "./algorand.transaction.axfer";
+import algosdk from 'algosdk'
+import { randomBytes } from "crypto"
+import nacl from "tweetnacl"
+import { SignedTransaction } from "./algorand.transaction"
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
@@ -46,7 +49,7 @@ describe("Algorand Encoding", () => {
 		const signature: Uint8Array = new Uint8Array(Buffer.from(randomBytes(64)))
 		const signedTransaction: Uint8Array = algorandCrafter.addSignature(encodedTransaction, signature)
 
-		const decodedSignedTransaction: object = algoEncoder.decodeSignedTransaction(signedTransaction)
+		const decodedSignedTransaction: SignedTransaction = algoEncoder.decodeSignedTransaction(signedTransaction)
 		expect(decodedSignedTransaction).toBeDefined()
 		expect(decodedSignedTransaction).toEqual({
 			sig: signature,
@@ -228,7 +231,7 @@ describe("Algorand Encoding", () => {
 		expect(encoded).toEqual(algoEncoder.encodeTransaction(txn))
 	})
 	it("(OK) Encode & Decode Address ", async () => {
-		const keyPair: SignKeyPair = {
+		const keyPair = {
 			publicKey: Uint8Array.from([
 				54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
 			]),
@@ -274,5 +277,199 @@ describe("Algorand Encoding", () => {
 		expect(() => {
 			algoEncoder.decodeAddress(address)
 		}).toThrowError(ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG)
+	})
+
+	describe("Transaction Groups", () => {
+		it("(OK) Legacy AlgoSDK - Encoding of transaction group", async () => {
+			const keyPair = {
+				publicKey: Uint8Array.from([
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+				secretKey: Uint8Array.from([
+					129, 128, 61, 158, 124, 215, 83, 137, 85, 47, 135, 151, 18, 162, 131, 63, 233, 138, 189, 56, 18, 114, 209, 4, 4, 128, 0, 159, 159, 76, 39, 85,
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+			}
+
+			const sender: string = algoEncoder.encodeAddress(Buffer.from(keyPair.publicKey))
+
+			const expectedTxn = new algosdk.Transaction({
+				type: algosdk.TransactionType.pay,
+				sender,
+				paymentParams: {
+				  receiver:
+					'UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM',
+				  amount: 847,
+				},
+				suggestedParams: {
+				  minFee: 1000,
+				  fee: 10,
+				  firstValid: 51,
+				  lastValid: 61,
+				  genesisHash: algosdk.base64ToBytes(
+					'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI='
+				  ),
+				  genesisID: 'mock-network',
+				},
+				note: new Uint8Array([123, 12, 200]),
+			  });
+
+			  expectedTxn.signTxn(keyPair.secretKey);
+		
+			  expectedTxn.group = algosdk.computeGroupID([expectedTxn]);
+			  const encTxn = algosdk.encodeMsgpack(expectedTxn);
+			  const decTxn = algosdk.decodeMsgpack(encTxn, algosdk.Transaction);
+			  expect(decTxn).toEqual(expectedTxn);
+		
+			  const encRep = expectedTxn.toEncodingData();
+			  const reencRep = decTxn.toEncodingData();
+			  expect(reencRep).toEqual(encRep);
+		})
+
+		it("(OK) Encoding of transaction group", async () => {
+			const keyPair = {
+				publicKey: Uint8Array.from([
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+				secretKey: Uint8Array.from([
+					129, 128, 61, 158, 124, 215, 83, 137, 85, 47, 135, 151, 18, 162, 131, 63, 233, 138, 189, 56, 18, 114, 209, 4, 4, 128, 0, 159, 159, 76, 39, 85,
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+			}
+
+			const sender: string = algoEncoder.encodeAddress(Buffer.from(keyPair.publicKey))
+			const receiver: string = "UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM"
+			const amount: number = 847
+			const firstValidRound: number = 51
+			const lastValidRound: number = 61
+			const genesisHashStr: string = "JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="
+			const genesisID: string = "mock-network"
+			const fee: number = 100000
+
+			const crafter: AlgorandTransactionCrafter = new AlgorandTransactionCrafter(genesisID, genesisHashStr)
+
+			// Build pay transaction
+			const payTxn: PayTransaction = crafter.pay(amount, sender, receiver)
+				.addFirstValidRound(firstValidRound)
+				.addLastValidRound(lastValidRound)
+				.addFee(fee)
+				.addAmount(amount)
+				.get()
+
+			let modelsEncodedTx: Uint8Array = payTxn.encode()
+
+			const expectedTxn = new algosdk.Transaction({
+				type: algosdk.TransactionType.pay,
+				sender,
+				paymentParams: {
+				  receiver,
+				  amount,
+				},
+				suggestedParams: {
+				  minFee: 100,
+				  fee,
+				  flatFee: true,
+				  firstValid: firstValidRound,
+				  lastValid: lastValidRound,
+				  genesisHash: algosdk.base64ToBytes(
+					genesisHashStr
+				  ),
+				  genesisID,
+				},
+			});
+
+			// algosdk sign
+			expectedTxn.signTxn(keyPair.secretKey);
+
+			// models sign
+			const sig: Uint8Array = nacl.sign.detached(modelsEncodedTx, keyPair.secretKey)
+
+			// attach sig
+			const signedTxModels: Uint8Array = crafter.addSignature(modelsEncodedTx, sig)
+
+			const bytesToSign: Uint8Array = expectedTxn.bytesToSign()
+			expect(modelsEncodedTx).toEqual(bytesToSign)
+		
+			expectedTxn.group = algosdk.computeGroupID([expectedTxn]);
+
+			// Compute correct group ID with models when signature is present on txns
+			const modelsGroupId: Uint8Array = new AlgorandEncoder().computeGroupId([signedTxModels])
+			expect(expectedTxn.group).toEqual(modelsGroupId)
+
+			// Compute correct group ID with models when signature is NOT present on txns
+			const modelsGroupId2: Uint8Array = new AlgorandEncoder().computeGroupId([modelsEncodedTx])
+			expect(expectedTxn.group).toEqual(modelsGroupId2)
+		})
+
+		it("(OK) Encoding of transaction group with multiple transactions from different signers", async () => {
+			const keyPair1 = {
+				publicKey: Uint8Array.from([
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+				secretKey: Uint8Array.from([
+					129, 128, 61, 158, 124, 215, 83, 137, 85, 47, 135, 151, 18, 162, 131, 63, 233, 138, 189, 56, 18, 114, 209, 4, 4, 128, 0, 159, 159, 76, 39, 85,
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 20,
+				]),
+			}
+
+			const keyPair2 = {
+				publicKey: Uint8Array.from([
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 21,
+				]),
+				secretKey: Uint8Array.from([
+					129, 128, 61, 158, 124, 215, 83, 137, 85, 47, 135, 151, 18, 162, 131, 63, 233, 138, 189, 56, 18, 114, 209, 4, 4, 128, 0, 159, 159, 76, 39, 85,
+					54, 40, 107, 229, 129, 45, 73, 38, 42, 70, 201, 214, 130, 182, 245, 154, 39, 250, 247, 34, 218, 97, 92, 98, 82, 0, 72, 242, 30, 197, 142, 21,
+				]),
+			}
+
+			const sender1: string = algoEncoder.encodeAddress(Buffer.from(keyPair1.publicKey))
+			const sender2: string = algoEncoder.encodeAddress(Buffer.from(keyPair2.publicKey))
+
+			const receiver: string = "UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM"
+			const amount: number = 847
+			const firstValidRound: number = 51
+			const lastValidRound: number = 61
+			const genesisHashStr: string = "JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="
+			const genesisID: string = "mock-network"
+			const fee: number = 100000
+
+			const crafter: AlgorandTransactionCrafter = new AlgorandTransactionCrafter(genesisID, genesisHashStr)
+			
+			// Build pay transaction
+			const payTxn1: PayTransaction = crafter.pay(amount, sender1, receiver)
+				.addFirstValidRound(firstValidRound)
+				.addLastValidRound(lastValidRound)
+				.addFee(fee)
+				.addAmount(amount)
+				.get()
+
+			const payTxn2: PayTransaction = crafter.pay(amount, sender2, receiver)
+				.addFirstValidRound(firstValidRound)
+				.addLastValidRound(lastValidRound)
+				.addFee(fee)
+				.addAmount(amount)
+				.get()
+
+			// encode transactions
+			const encodedTxn1: Uint8Array = payTxn1.encode()
+			const encodedTxn2: Uint8Array = payTxn2.encode()
+
+			// sign transactions
+			const sig1: Uint8Array = nacl.sign.detached(encodedTxn1, keyPair1.secretKey)
+			const sig2: Uint8Array = nacl.sign.detached(encodedTxn2, keyPair2.secretKey)
+
+			// attach sigs
+			const signedTxn1: Uint8Array = crafter.addSignature(encodedTxn1, sig1)
+			const signedTxn2: Uint8Array = crafter.addSignature(encodedTxn2, sig2)
+
+			// group transactions
+			const group: Uint8Array = algoEncoder.computeGroupId([signedTxn1, signedTxn2])
+
+			// create expected group
+			const expectedGroup: Uint8Array = algoEncoder.computeGroupId([signedTxn1, signedTxn2])
+
+			// match group ids
+			expect(group).toEqual(expectedGroup)
+		})
 	})
 })
