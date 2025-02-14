@@ -18,7 +18,7 @@
     "test": "jest lib --verbose --maxWorkers=1",
     "test:cov": "jest lib --coverage --maxWorkers=1",
     "typedoc": "typedoc",
-    "release": "semantic-release --dry-run",
+    "release": "semantic-release",
     "prepare": "husky install"
   },
   "author": "",
