@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/appl.transaction.json",
+  "title": "Application Call Transaction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "http://algo-models.com/schemas/transaction.header.json"},
+    {
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "appl"
+        },
+        "apid": {
+          "title": "Application ID",
+          "typeof": "bigint",
+          "description": "ID of the application being configured or empty if creating."
+        },
+        "apan": {
+          "title": "OnComplete",
+          "type": "number",
+          "description": "Defines what additional actions occur with the transaction."
+        },
+        "apat": {
+          "title": "Accounts",
+          "type": "array",
+          "description": "List of accounts in addition to the sender that may be accessed from the application's approval-program and clear-state-program.",
+          "items": {
+            "typeof" : "Uint8Array",
+            "description": "Account address in bytes"
+          }
+        },
+        "apap": {
+          "title": "Approval Program",
+          "typeof" : "Uint8Array",
+          "description": "Logic executed for every application transaction, except when on-completion is set to \"clear\".\nIt can read and write global state for the application, as well as account-specific local state.\nApproval programs may reject the transaction."
+        },
+        "apaa": {
+          "title": "App Arguments",
+          "type": "array",
+          "description": "Transaction-specific arguments accessed from the application's approval-program and clear-state-program.",
+          "items": {
+            "typeof" : "Uint8Array",
+            "description": "Argument in bytes"
+          }
+        },
+        "apsu": {
+          "title": "Clear State Program",
+          "typeof" : "Uint8Array",
+          "description": "Logic executed for application transactions with on-completion set to \"clear\".\nIt can read and write global state for the application, as well as account-specific local state.\nClear state programs cannot reject the transaction."
+        },
+        "apfa": {
+          "title": "Foreign Apps",
+          "type": "array",
+          "description": "Lists the applications in addition to the application-id whose global states may\nbe accessed by this application's approval-program and clear-state-program.\nThe access is read-only.",
+          "items": {
+            "typeof": "bigint",
+            "description": "Application id"
+          }
+        },
+        "apas": {
+          "title": "Foreign Assets",
+          "type": "array",
+          "description": "Lists the assets whose AssetParams may be accessed by this application's approval-program and clear-state-program. The access is read-only.",
+          "items": {
+            "typeof": "bigint",
+            "description": "Assset id"
+          }
+        },
+        "apgs": {
+          "title": "Global StateSchema",
+          "description": "Holds the maximum number of global state values defined within a StateSchema object.",
+          "$ref": "http://algo-models.com/schemas/state.schema.json"
+        },
+        "apls": {
+          "title": "Local StateSchema",
+          "description": "Holds the maximum number of local state values defined within a StateSchema object."
+        },
+        "apep": {
+          "title": "Extra Program Pages",
+          "type": "number",
+          "description": "Number of additional pages allocated to the application's approval and clear state programs.\nEach ExtraProgramPages is 2048 bytes.\nThe sum of ApprovalProgram and ClearStateProgram may not exceed 2048*(1+ExtraProgramPages) bytes."
+        },
+        "apbx": {
+          "title": "Boxes",
+          "type": "array",
+          "description": "The boxes that should be made available for the runtime of the program.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "i": {
+                "type": "number"
+              },
+              "n": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": ["type", "apid", "apan"]
+    }]
+}
