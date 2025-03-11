@@ -110,7 +110,9 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         return this
     }
     addAssetAmount(aamt: number | bigint): IAssetTransferTxBuilder {
-        this.tx.aamt = AlgorandEncoder.safeCastBigInt(aamt)
+        if(BigInt(aamt)  !== 0n) {
+            this.tx.aamt = AlgorandEncoder.safeCastBigInt(aamt)
+        }
         return this
     }
     addAssetSender(asnd: string): IAssetTransferTxBuilder {

@@ -9,6 +9,10 @@ jobs:
       matrix:
         node-version: [ 18.x, 20.x ]
     steps:
+      - name: Install algokit
+        run: pipx install algokit
+      - name: Start LocalNet
+        run: algokit localnet start
       -
         name: Checkout
         uses: actions/checkout@v4.1.0
