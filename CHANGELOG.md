@@ -1,3 +1,10 @@
+# [1.0.0-canary.2](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.1...v1.0.0-canary.2) (2025-03-12)
+
+
+### Bug Fixes
+
+* **axfer:** convert asset amount to undefined ([1cd1767](https://github.com/algorandfoundation/algo-models/commit/1cd1767cdfdc69e361ccfe8bcd48df4a73b1b76d)), closes [#24](https://github.com/algorandfoundation/algo-models/issues/24)
+
 # 1.0.0-canary.1 (2025-02-14)
 
 
