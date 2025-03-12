@@ -1,10 +1,18 @@
-import {algo, AlgorandClient, waitForConfirmation} from '@algorandfoundation/algokit-utils'
-import {AlgorandTransactionCrafter, AssetConfigTransaction, AssetParamsBuilder} from "./index";
-import {Address, SuggestedParams} from "algosdk";
+import {AlgorandClient, waitForConfirmation} from '@algorandfoundation/algokit-utils'
+import {
+  AlgorandTransactionCrafter, ApplicationCallTransaction,
+  ApplicationCallTxBuilder,
+  AssetConfigTransaction,
+  AssetParamsBuilder, Transaction
+} from "./index";
+import algosdk, {Address, SuggestedParams} from "algosdk";
 import {SigningAccount, TransactionSignerAccount} from "@algorandfoundation/algokit-utils/types/account";
 import {AlgoAmount} from "@algorandfoundation/algokit-utils/types/amount";
 import {encode} from "hi-base32";
 import {sha512_256} from "js-sha512";
+import {Arc56Contract} from "@algorandfoundation/algokit-utils/types/app-arc56";
+import {decode} from "algorand-msgpack";
+import * as msgpack from "algo-msgpack-with-bigint";
 
 export type KeyPairRecord = {
   id: string
@@ -61,9 +69,10 @@ export function generateChecksum(publicKey: Uint8Array){
       );
 }
 
-
-
 describe('Algorand Transaction Crafter', () => {
+  let genesisId: string
+  let genesisHash: string
+
   let algorand: AlgorandClient
   let deployer: Address & TransactionSignerAccount & {
     account: SigningAccount;
@@ -76,7 +85,7 @@ describe('Algorand Transaction Crafter', () => {
 
   beforeAll(async () => {
     algorand = AlgorandClient.fromEnvironment()
-    deployer = await algorand.account.fromEnvironment('DEPLOYER')
+    deployer = await algorand.account.fromEnvironment('DEPLOYER', new AlgoAmount({algos: 10000}))
 
     masterKeyPair = await generateKey()
     secondaryKeyPair = await generateKey()
@@ -85,7 +94,9 @@ describe('Algorand Transaction Crafter', () => {
     await algorand.account.ensureFunded(secondaryKeyPair.id, deployer, new AlgoAmount({algos: 10}))
 
     params = await algorand.getSuggestedParams()
-    algorandCrafter = new AlgorandTransactionCrafter(params.genesisID as string, Buffer.from(params.genesisHash as Uint8Array).toString('base64'))
+    genesisId = params.genesisID as string
+    genesisHash = Buffer.from(params.genesisHash as Uint8Array).toString('base64')
+    algorandCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
   }, 10000)
 
   it("(OK) Pay Transaction", async () => {
@@ -107,7 +118,7 @@ describe('Algorand Transaction Crafter', () => {
     expect(account.status).toEqual("Offline")
     const onlineTxn = algorandCrafter
       .changeOnline(
-          masterKeyPair.id,
+        masterKeyPair.id,
         // Vote Key
         "CR3Bf/IJqzHC1TORQe83QnAkcB+JLyb+opP8f8q3ke0=",
         // Selection Key
@@ -238,5 +249,105 @@ describe('Algorand Transaction Crafter', () => {
     const destroySigned = algorandCrafter.addSignature(destroyEncodedTxn, destroySignature)
     const destroyResult = await algorand.client.algod.sendRawTransaction(destroySigned).do()
     await waitForConfirmation(destroyResult.txid, 20, algorand.client.algod)
+  })
+  it("(OK Application Create/Delete)", async ()=>{
+    const appSpec = {
+      "name": "Empty",
+      "structs": {},
+      "methods": [],
+      "arcs": [
+        22,
+        28
+      ],
+      "networks": {},
+      "state": {
+        "schema": {
+          "global": {
+            "ints": 0,
+            "bytes": 0
+          },
+          "local": {
+            "ints": 0,
+            "bytes": 0
+          }
+        },
+        "keys": {
+          "global": {},
+          "local": {},
+          "box": {}
+        },
+        "maps": {
+          "global": {},
+          "local": {},
+          "box": {}
+        }
+      },
+      "bareActions": {
+        "create": [
+          "NoOp"
+        ],
+        "call": []
+      },
+      "sourceInfo": {
+        "approval": {
+          "sourceInfo": [
+            {
+              "pc": [
+                14
+              ],
+              "errorMessage": "can only call when creating"
+            }
+          ],
+          "pcOffsetMethod": "none"
+        },
+        "clear": {
+          "sourceInfo": [],
+          "pcOffsetMethod": "none"
+        }
+      },
+      "source": {
+        "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBjb250cmFjdHMuZW1wdHkuRW1wdHkuX19hbGdvcHlfZW50cnlwb2ludF93aXRoX2luaXQoKSAtPiB1aW50NjQ6Cm1haW46CiAgICAvLyAvaG9tZS96ZXJvL1Byb2plY3RzL3N0b3JlLWtpdC9jb250cmFjdHMvZW1wdHkucHk6MwogICAgLy8gY2xhc3MgRW1wdHkoQVJDNENvbnRyYWN0KToKICAgIHR4biBOdW1BcHBBcmdzCiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDYKICAgIHR4biBPbkNvbXBsZXRpb24KICAgIGJueiBtYWluX2FmdGVyX2lmX2Vsc2VANgogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCm1haW5fYWZ0ZXJfaWZfZWxzZUA2OgogICAgLy8gL2hvbWUvemVyby9Qcm9qZWN0cy9zdG9yZS1raXQvY29udHJhY3RzL2VtcHR5LnB5OjMKICAgIC8vIGNsYXNzIEVtcHR5KEFSQzRDb250cmFjdCk6CiAgICBwdXNoaW50IDAgLy8gMAogICAgcmV0dXJuCg==",
+        "clear": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"
+      },
+      "byteCode": {
+        "approval": "CjEbQAAMMRlAAAcxGBREgQFDgQBD",
+        "clear": "CoEBQw=="
+      },
+      "compilerInfo": {
+        "compiler": "puya",
+        "compilerVersion": {
+          "major": 4,
+          "minor": 4,
+          "patch": 0
+        }
+      },
+      "events": [],
+      "templateVariables": {}
+    } as Arc56Contract
+
+    // Create Transaction Factory using Master KeyPair
+    const client = algorand.client.getAppFactory({
+      appSpec,
+      defaultSender: deployer.addr,
+      defaultSigner: deployer.signer
+    })
+
+    const compilationResult = await client.compile()
+
+    const applicationCallTransaction = new ApplicationCallTxBuilder(genesisId, genesisHash)
+        .addSender(masterKeyPair.id)
+        .addApprovalProgram(compilationResult.approvalProgram)
+        .addClearStateProgram(compilationResult.clearStateProgram)
+        .addFirstValidRound(params.firstValid)
+        .addLastValidRound(params.lastValid)
+        .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
+        .get()
+
+
+    const encodedTxn = applicationCallTransaction.encode()
+    const signature = await sign(encodedTxn, masterKeyPair)
+    const signed = algorandCrafter.addSignature(encodedTxn, signature)
+    const {txid} = await algorand.client.algod.sendRawTransaction(signed).do()
+    await waitForConfirmation(txid, 20, algorand.client.algod)
   })
 })
