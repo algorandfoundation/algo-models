@@ -5,7 +5,7 @@ import {
   AssetConfigTransaction,
   AssetParamsBuilder, Transaction
 } from "./index";
-import algosdk, {Address, SuggestedParams} from "algosdk";
+import algosdk, {ABIStringType, Address, SuggestedParams} from "algosdk";
 import {SigningAccount, TransactionSignerAccount} from "@algorandfoundation/algokit-utils/types/account";
 import {AlgoAmount} from "@algorandfoundation/algokit-utils/types/amount";
 import {encode} from "hi-base32";
@@ -252,9 +252,31 @@ describe('Algorand Transaction Crafter', () => {
   })
   it("(OK Application Create/Delete)", async ()=>{
     const appSpec = {
-      "name": "Empty",
+      "name": "HelloWorld",
       "structs": {},
-      "methods": [],
+      "methods": [
+        {
+          "name": "hello",
+          "args": [
+            {
+              "type": "string",
+              "name": "name"
+            }
+          ],
+          "returns": {
+            "type": "string"
+          },
+          "actions": {
+            "create": [],
+            "call": [
+              "NoOp"
+            ]
+          },
+          "readonly": false,
+          "events": [],
+          "recommendations": {}
+        }
+      ],
       "arcs": [
         22,
         28
@@ -293,9 +315,21 @@ describe('Algorand Transaction Crafter', () => {
           "sourceInfo": [
             {
               "pc": [
-                14
+                25
+              ],
+              "errorMessage": "OnCompletion is not NoOp"
+            },
+            {
+              "pc": [
+                66
               ],
               "errorMessage": "can only call when creating"
+            },
+            {
+              "pc": [
+                28
+              ],
+              "errorMessage": "can only call when not creating"
             }
           ],
           "pcOffsetMethod": "none"
@@ -306,19 +340,19 @@ describe('Algorand Transaction Crafter', () => {
         }
       },
       "source": {
-        "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBjb250cmFjdHMuZW1wdHkuRW1wdHkuX19hbGdvcHlfZW50cnlwb2ludF93aXRoX2luaXQoKSAtPiB1aW50NjQ6Cm1haW46CiAgICAvLyAvaG9tZS96ZXJvL1Byb2plY3RzL3N0b3JlLWtpdC9jb250cmFjdHMvZW1wdHkucHk6MwogICAgLy8gY2xhc3MgRW1wdHkoQVJDNENvbnRyYWN0KToKICAgIHR4biBOdW1BcHBBcmdzCiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDYKICAgIHR4biBPbkNvbXBsZXRpb24KICAgIGJueiBtYWluX2FmdGVyX2lmX2Vsc2VANgogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCm1haW5fYWZ0ZXJfaWZfZWxzZUA2OgogICAgLy8gL2hvbWUvemVyby9Qcm9qZWN0cy9zdG9yZS1raXQvY29udHJhY3RzL2VtcHR5LnB5OjMKICAgIC8vIGNsYXNzIEVtcHR5KEFSQzRDb250cmFjdCk6CiAgICBwdXNoaW50IDAgLy8gMAogICAgcmV0dXJuCg==",
+        "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuYXBwcm92YWxfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBIZWxsb1dvcmxkKEFSQzRDb250cmFjdCk6CiAgICB0eG4gTnVtQXBwQXJncwogICAgYnogbWFpbl9iYXJlX3JvdXRpbmdANgogICAgcHVzaGJ5dGVzIDB4MDJiZWNlMTEgLy8gbWV0aG9kICJoZWxsbyhzdHJpbmcpc3RyaW5nIgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAogICAgbWF0Y2ggbWFpbl9oZWxsb19yb3V0ZUAzCgptYWluX2FmdGVyX2lmX2Vsc2VAMTA6CiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgcHVzaGludCAwIC8vIDAKICAgIHJldHVybgoKbWFpbl9oZWxsb19yb3V0ZUAzOgogICAgLy8gc21hcnRfY29udHJhY3RzL2hlbGxvX3dvcmxkL2NvbnRyYWN0LnB5OjYKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQogICAgZXh0cmFjdCAyIDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo2CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIGNhbGxzdWIgaGVsbG8KICAgIGR1cAogICAgbGVuCiAgICBpdG9iCiAgICBleHRyYWN0IDYgMgogICAgc3dhcAogICAgY29uY2F0CiAgICBwdXNoYnl0ZXMgMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCm1haW5fYmFyZV9yb3V0aW5nQDY6CiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgdHhuIE9uQ29tcGxldGlvbgogICAgYm56IG1haW5fYWZ0ZXJfaWZfZWxzZUAxMAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCgovLyBzbWFydF9jb250cmFjdHMuaGVsbG9fd29ybGQuY29udHJhY3QuSGVsbG9Xb3JsZC5oZWxsbyhuYW1lOiBieXRlcykgLT4gYnl0ZXM6CmhlbGxvOgogICAgLy8gc21hcnRfY29udHJhY3RzL2hlbGxvX3dvcmxkL2NvbnRyYWN0LnB5OjYtNwogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgaGVsbG8oc2VsZiwgbmFtZTogU3RyaW5nKSAtPiBTdHJpbmc6CiAgICBwcm90byAxIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo4CiAgICAvLyByZXR1cm4gIkhlbGxvLCAiICsgbmFtZQogICAgcHVzaGJ5dGVzICJIZWxsbywgIgogICAgZnJhbWVfZGlnIC0xCiAgICBjb25jYXQKICAgIHJldHN1Ygo=",
         "clear": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"
       },
       "byteCode": {
-        "approval": "CjEbQAAMMRlAAAcxGBREgQFDgQBD",
+        "approval": "CjEbQQA0gAQCvs4RNhoAjgEAA4EAQzEZFEQxGEQ2GgFXAgCIACBJFRZXBgJMUIAEFR98dUxQsIEBQzEZQP/UMRgURIEBQ4oBAYAHSGVsbG8sIIv/UIk=",
         "clear": "CoEBQw=="
       },
       "compilerInfo": {
         "compiler": "puya",
         "compilerVersion": {
           "major": 4,
-          "minor": 4,
-          "patch": 0
+          "minor": 5,
+          "patch": 3
         }
       },
       "events": [],
@@ -348,6 +382,21 @@ describe('Algorand Transaction Crafter', () => {
     const signature = await sign(encodedTxn, masterKeyPair)
     const signed = algorandCrafter.addSignature(encodedTxn, signature)
     const {txid} = await algorand.client.algod.sendRawTransaction(signed).do()
-    await waitForConfirmation(txid, 20, algorand.client.algod)
+    const {applicationIndex} = await waitForConfirmation(txid, 20, algorand.client.algod)
+
+    const callMethodTransaction = new ApplicationCallTxBuilder(genesisId, genesisHash)
+        .addApplicationId(applicationIndex as bigint)
+        .addApplicationArgs([new Uint8Array(sha512_256.array(Buffer.from("hello(string)string")).slice(0, 4)), Buffer.from("world")])
+        .addSender(masterKeyPair.id)
+        .addFirstValidRound(params.firstValid)
+        .addLastValidRound(params.lastValid)
+        .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
+        .get()
+
+    const callMethodEncodedTxn = callMethodTransaction.encode()
+    const callMethodSignature = await sign(callMethodEncodedTxn, masterKeyPair)
+    const callMethodSigned = algorandCrafter.addSignature(callMethodEncodedTxn, callMethodSignature)
+    const callMethodResult = await algorand.client.algod.sendRawTransaction(callMethodSigned).do()
+    await waitForConfirmation(callMethodResult.txid, 20, algorand.client.algod)
   })
 })
