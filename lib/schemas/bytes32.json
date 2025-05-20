@@ -198,5 +198,6 @@
     "29",
     "30",
     "31"
-  ]
+  ],
+  "additionalProperties": false
 }
