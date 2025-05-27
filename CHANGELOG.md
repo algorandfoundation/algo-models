@@ -1,3 +1,10 @@
+# [1.0.0-canary.3](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.2...v1.0.0-canary.3) (2025-05-27)
+
+
+### Bug Fixes
+
+* bytes32 and bytes64 schemas should expects exactly 32 and 64 bytes ([29807c4](https://github.com/algorandfoundation/algo-models/commit/29807c4b4eac6234e95ef933429fc8e0ab0490b0))
+
 # [1.0.0-canary.2](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.1...v1.0.0-canary.2) (2025-03-12)
 
 
