@@ -1,8 +1,16 @@
 /**
+ * @internal
+ */
+export const ALGORAND_LEASE_LENGTH_ERROR_MSG = "Lease length must be exactly 32 bytes"
+
+
+/**
  * Specifies the type of transaction. This value is automatically generated using any of the developer tools.
  * @category Common
  */
 export type TransactionType = "pay" | "keyreg" | "acfg" | "axfer" | "afrz" | "appl" | "stpf"
+
+
 
 /**
  *
@@ -88,6 +96,17 @@ export abstract class TransactionHeader {
      * Assign a group ID to a transaction through the workflow described in the Atomic Transfers Guide.
      */
     grp?: Uint8Array
+
+    /**
+     * validateLease
+     * 
+     * static helped method to validate lease length
+     */
+	static validateLease(lx: Uint8Array) {
+		if (lx.length !== 32) {
+			throw new Error(ALGORAND_LEASE_LENGTH_ERROR_MSG)
+		}
+	}
 }
 
 /**

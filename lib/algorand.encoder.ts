@@ -18,8 +18,6 @@ export const MALFORMED_ADDRESS_ERROR_MSG = "Malformed address"
  */
 export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 
-export const ALGORAND_LEASE_LENGTH_ERROR_MSG = "Lease length must be exactly 32 bytes"
-
 /**
  * @category Encoding
  */
@@ -155,12 +153,5 @@ if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Num
 			throw new Error("Value is not within the safe integer range")
 		}
 		return bigIntValue
-	}
-
-	// validate lease length
-	static validateLease(lx: Uint8Array) {
-		if (lx.length !== 32) {
-			throw new Error(ALGORAND_LEASE_LENGTH_ERROR_MSG)
-		}
 	}
 }

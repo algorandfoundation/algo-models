@@ -1,5 +1,5 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * @category Transactions
@@ -187,7 +187,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		return this
 	}
 	addLease(lx: Uint8Array): IKeyregTxBuilder {
-		AlgorandEncoder.validateLease(lx)
+		TransactionHeader.validateLease(lx)
 		this.tx.lx = lx
 		return this
 	}

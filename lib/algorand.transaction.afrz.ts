@@ -1,5 +1,5 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * Includes all fields in {@link TransactionHeader} and "type" is "axfer".
@@ -114,7 +114,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         return this
     }
     addLease(lease: Uint8Array): IAssetFreezeTxBuilder {
-        AlgorandEncoder.validateLease(lease)
+        TransactionHeader.validateLease(lease)
         this.tx.lx = lease
         return this
     }

@@ -1,18 +1,19 @@
 import { sha512_256 } from "js-sha512"
 import base32 from "hi-base32"
-import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, ALGORAND_LEASE_LENGTH_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"
+import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"
 import * as msgpack from "algo-msgpack-with-bigint"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
-import {AssetParamsBuilder} from "./algorand.asset.params";
-import {AssetConfigTransaction} from "./algorand.transaction.acfg";
-import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
-import {AssetTransferTransaction} from "./algorand.transaction.axfer";
+import { AssetParamsBuilder } from "./algorand.asset.params"
+import { AssetConfigTransaction } from "./algorand.transaction.acfg"
+import { AssetFreezeTransaction } from "./algorand.transaction.afrz"
+import { AssetTransferTransaction } from "./algorand.transaction.axfer"
 import algosdk from 'algosdk'
 import { randomBytes } from "crypto"
 import nacl from "tweetnacl"
 import { SignedTransaction } from "./algorand.transaction"
+import { TransactionHeader, ALGORAND_LEASE_LENGTH_ERROR_MSG } from "./algorand.transaction.header"
 
 export function concatArrays(...arrs: ArrayLike<number>[]) {
 	const size = arrs.reduce((sum, arr) => sum + arr.length, 0)
@@ -283,7 +284,7 @@ describe("Algorand Encoding", () => {
 		const lease = new Uint8Array(31);
 
 		expect(() => {
-			AlgorandEncoder.validateLease(lease)
+			TransactionHeader.validateLease(lease)
 		}).toThrowError(ALGORAND_LEASE_LENGTH_ERROR_MSG)
 	})
 
