@@ -187,6 +187,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		return this
 	}
 	addLease(lx: Uint8Array): IKeyregTxBuilder {
+		AlgorandEncoder.validateLease(lx)
 		this.tx.lx = lx
 		return this
 	}

@@ -114,6 +114,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         return this
     }
     addLease(lease: Uint8Array): IAssetFreezeTxBuilder {
+        AlgorandEncoder.validateLease(lease)
         this.tx.lx = lease
         return this
     }

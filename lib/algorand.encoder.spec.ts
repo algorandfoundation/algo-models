@@ -1,6 +1,6 @@
 import { sha512_256 } from "js-sha512"
 import base32 from "hi-base32"
-import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"
+import { ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG, ALGORAND_LEASE_LENGTH_ERROR_MSG, AlgorandEncoder, MALFORMED_ADDRESS_ERROR_MSG } from "./algorand.encoder"
 import * as msgpack from "algo-msgpack-with-bigint"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
@@ -277,6 +277,14 @@ describe("Algorand Encoding", () => {
 		expect(() => {
 			algoEncoder.decodeAddress(address)
 		}).toThrowError(ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG)
+	})
+
+	it("(FAIL) validating lease - Bad length", async () => {
+		const lease = new Uint8Array(31);
+
+		expect(() => {
+			AlgorandEncoder.validateLease(lease)
+		}).toThrowError(ALGORAND_LEASE_LENGTH_ERROR_MSG)
 	})
 
 	describe("Transaction Groups", () => {

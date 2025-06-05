@@ -113,6 +113,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         return this
     }
     addLease(lx: Uint8Array): IAssetConfigTxBuilder {
+        AlgorandEncoder.validateLease(lx)
         this.tx.lx = lx
         return this
     }

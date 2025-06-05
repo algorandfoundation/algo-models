@@ -152,6 +152,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         return this
     }
     addLease(lease: Uint8Array): IAssetTransferTxBuilder {
+        AlgorandEncoder.validateLease(lease)
         this.tx.lx = lease
         return this
     }

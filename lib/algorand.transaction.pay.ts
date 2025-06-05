@@ -116,6 +116,7 @@ export class PayTxBuilder implements IPayTxBuilder {
 		return this
 	}
 	addLease(lx: Uint8Array): IPayTxBuilder {
+		AlgorandEncoder.validateLease(lx)
 		this.tx.lx = lx
 		return this
 	}

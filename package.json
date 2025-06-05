@@ -1,6 +1,6 @@
 {
   "name": "@algorandfoundation/algo-models",
-  "version": "1.0.0-canary.3",
+  "version": "1.0.0-canary.4",
   "description": "This package is meant for integrators that want to add Algorand's functionality to their applications",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
