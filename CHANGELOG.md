@@ -1,3 +1,10 @@
+# [1.0.0-canary.4](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.3...v1.0.0-canary.4) (2025-06-10)
+
+
+### Features
+
+* add lease length validation ([aaa1c20](https://github.com/algorandfoundation/algo-models/commit/aaa1c207192873663e6b9f561374a8ae2a7b1d63))
+
 # [1.0.0-canary.3](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.2...v1.0.0-canary.3) (2025-05-27)
 
 
