@@ -1,5 +1,5 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * Asset Transfer Transaction
@@ -152,6 +152,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         return this
     }
     addLease(lease: Uint8Array): IAssetTransferTxBuilder {
+        TransactionHeader.validateLease(lease)
         this.tx.lx = lease
         return this
     }

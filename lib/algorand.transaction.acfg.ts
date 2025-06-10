@@ -1,6 +1,6 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {AssetParams} from "./algorand.asset.params.js";
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
+import { AssetParams } from "./algorand.asset.params.js";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * This is used to create, configure and destroy an asset depending on which fields are set.
@@ -113,6 +113,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         return this
     }
     addLease(lx: Uint8Array): IAssetConfigTxBuilder {
+        TransactionHeader.validateLease(lx)
         this.tx.lx = lx
         return this
     }
