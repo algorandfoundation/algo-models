@@ -1,0 +1,1 @@
+> More detailed explanation about the asset parameters can be added to the documentation
