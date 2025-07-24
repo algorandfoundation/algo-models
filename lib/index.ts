@@ -9,6 +9,7 @@ export * from './algorand.transaction.crafter.js'
 // Transactions/Builders
 export * from './algorand.transaction.acfg.js'
 export * from './algorand.transaction.afrz.js'
+export * from './algorand.transaction.appl.js'
 export * from './algorand.transaction.axfer.js'
 export * from './algorand.transaction.keyreg.js'
 export * from './algorand.transaction.pay.js'
