@@ -1,3 +1,10 @@
+# [1.0.0-canary.5](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.4...v1.0.0-canary.5) (2025-07-24)
+
+
+### Bug Fixes
+
+* yarn:test also ran e2e that need config, so they fail. Separate them ([a0e989a](https://github.com/algorandfoundation/algo-models/commit/a0e989a50141e9dd5838e17b1c1ff2b6214cc179))
+
 # [1.0.0-canary.4](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.3...v1.0.0-canary.4) (2025-06-10)
 
 
