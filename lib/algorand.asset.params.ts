@@ -1,7 +1,18 @@
 import {AlgorandEncoder} from "./algorand.encoder.js";
 
 /**
+ * Asset Parameters
+ *
+ * Specifies the parameters for an asset.
+ * (apar) when part of an AssetConfig transaction.
+ *
+ * #### Quick Start:
+ * {@includeCode ./algorand.asset.params.spec.ts#imports,quickStart}
+ *
+ * {@include ./algorand.asset.params.md}
+ *
  * @category Common
+ * @see {@link AssetConfigTransaction}
  */
 export class AssetParams {
     /**

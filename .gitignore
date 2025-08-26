@@ -1,4 +1,5 @@
-docs
+docs/*
+!docs/.gitkeep
 .idea
 dist/*
 !dist/esm
