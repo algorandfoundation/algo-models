@@ -24,6 +24,9 @@
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
+  "publishConfig": {
+    "provenance": true
+  },
   "devDependencies": {
     "@algorandfoundation/algokit-utils": "^8.2.2",
     "@commitlint/cli": "^17.8.0",
