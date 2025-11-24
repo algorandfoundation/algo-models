@@ -21,7 +21,7 @@ export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 /**
  * @category Encoding
  */
-export class AlgorandEncoder extends Encoder{
+export class AlgorandEncoder extends Encoder {
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
 	 * @param address - an Algorand address with checksum.
@@ -60,22 +60,45 @@ export class AlgorandEncoder extends Encoder{
 	}
 
 	/**
-	 * 
-	 * @param stx 
+	 * Removes any own enumerable property whose value is considered a default.
+	 * Default criteria delegated to isDefaultValue. Undefined values are already ignored by msgpack.
+	 * @internal
+	 */
+	static omitDefaultFields<T extends object>(obj: T): Partial<T> {
+		const cleaned: Record<string, unknown> = {}
+		const source = obj as Record<string, unknown>
+		for (const key of Object.keys(source)) {
+			const value = source[key]
+			if (value === undefined) continue
+			if (AlgorandEncoder.isDefaultValue(value)) continue
+			cleaned[key] = value
+		}
+		return cleaned as Partial<T>
+	}
+
+	/**
+	 * Encodes a signed transaction
+	 * @param stx
+	 * @param omitDefaults when true, drops default-valued fields from stx before encoding
+
 	 * @returns 
 	 */
-	encodeSignedTransaction(stx: object): Uint8Array {
+	encodeSignedTransaction(stx: object, omitDefaults = true): Uint8Array {
+		stx = omitDefaults ? AlgorandEncoder.omitDefaultFields(stx) as Transaction : stx
 		const encodedTxn: Uint8Array = new Uint8Array(msgpack.encode(stx, { sortKeys: true, ignoreUndefined: true }))
 		return encodedTxn
 	}
 
 	/**
-	 *
+	 * Encodes a transaction and prepares it for signing by adding the "TX" tag
 	 * @param tx
+	 * @param omitDefaults when true, drops default-valued fields before encoding
 	 */
-	encodeTransaction(tx: Transaction): Uint8Array {
+	encodeTransaction(tx: Transaction, omitDefaults = true): Uint8Array {
+		const working = omitDefaults ? AlgorandEncoder.omitDefaultFields(tx) : tx
+
 		// [TAG] [AMT] .... [NOTE] [RCV] [SND] [] [TYPE]
-		const encoded: Uint8Array = msgpack.encode(tx, { sortKeys: true, ignoreUndefined: true })
+		const encoded: Uint8Array = msgpack.encode(working, { sortKeys: true, ignoreUndefined: true })
 
 		// tag
 		const TAG: Buffer = Buffer.from("TX")
@@ -114,9 +137,9 @@ export class AlgorandEncoder extends Encoder{
 	computeGroupId(txns: Uint8Array[]): Uint8Array {
 		// ensure nr of txns in group are between 0 and 16
 		if (txns.length < 1 || txns.length > 16) throw new Error("Invalid number of transactions in group")
-		
-		
-		const hashes: Uint8Array[] = txns.map(txn => { 
+
+
+		const hashes: Uint8Array[] = txns.map(txn => {
 			let encoded: Uint8Array
 
 			try {
@@ -132,8 +155,8 @@ export class AlgorandEncoder extends Encoder{
 		})
 
 		// encode { txList: [tx1, tx2, ...] } with msgpack
-		const encodedTxList: Uint8Array = msgpack.encode({ txlist: hashes }, { sortKeys: true, ignoreUndefined: true }) 
-		
+		const encodedTxList: Uint8Array = msgpack.encode({ txlist: hashes }, { sortKeys: true, ignoreUndefined: true })
+
 		// Concat group tag + encoded
 		const concatTagList: Uint8Array = Encoder.ConcatArrays(Buffer.from("TG"), encodedTxList)
 
@@ -149,9 +172,32 @@ export class AlgorandEncoder extends Encoder{
 	 */
 	static safeCastBigInt(value: number | bigint): bigint {
 		const bigIntValue = BigInt(value)
-if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
+		if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
 			throw new Error("Value is not within the safe integer range")
 		}
 		return bigIntValue
+	}
+
+	/**
+	 * Checks if an entry is the default value and returns a boolean if that is the case.
+	 * @param value - The value of unknown type to be chedked
+	 * @returns boolean - true if the value is default, false otherwise
+	 * @throws Error if the value type is unsupported
+	*/
+	static isDefaultValue(value: unknown): boolean {
+		// zeroAddress check, equivalent to "AAA...AY5HFKQ"
+		if (value instanceof Uint8Array) {
+			if (value.length !== ALGORAND_PUBLIC_KEY_BYTE_LENGTH) return false
+			for (let i = 0; i < ALGORAND_PUBLIC_KEY_BYTE_LENGTH; i++) {
+				if (value[i] !== 0) return false
+			}
+			return true
+		}
+		if (typeof value === "number") return value === 0
+		if (typeof value === "bigint") return value === 0n
+		if (typeof value === "string") return value === ""
+		if (typeof value === "boolean") return value === false
+		// All other types (boolean, object, function, null, undefined) are never treated as default
+		return false
 	}
 }

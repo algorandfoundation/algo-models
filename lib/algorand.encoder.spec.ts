@@ -84,9 +84,9 @@ describe("Algorand Encoding", () => {
 				rcv: algoEncoder.decodeAddress(to),
 				snd: algoEncoder.decodeAddress(from),
 				amt: 1000n,
-				fv: 1000,
-				lv: 2000,
-				fee: 1000,
+				fv: 1000n,
+				lv: 2000n,
+				fee: 1000n,
 				gen: genesisId,
 				gh: new Uint8Array(Buffer.from(genesisHash, "base64")),
 				type: "pay",
@@ -306,33 +306,33 @@ describe("Algorand Encoding", () => {
 				type: algosdk.TransactionType.pay,
 				sender,
 				paymentParams: {
-				  receiver:
-					'UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM',
-				  amount: 847,
+					receiver:
+						'UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM',
+					amount: 847,
 				},
 				suggestedParams: {
-				  minFee: 1000,
-				  fee: 10,
-				  firstValid: 51,
-				  lastValid: 61,
-				  genesisHash: algosdk.base64ToBytes(
-					'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI='
-				  ),
-				  genesisID: 'mock-network',
+					minFee: 1000,
+					fee: 10,
+					firstValid: 51,
+					lastValid: 61,
+					genesisHash: algosdk.base64ToBytes(
+						'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI='
+					),
+					genesisID: 'mock-network',
 				},
 				note: new Uint8Array([123, 12, 200]),
-			  });
+			});
 
-			  expectedTxn.signTxn(keyPair.secretKey);
-		
-			  expectedTxn.group = algosdk.computeGroupID([expectedTxn]);
-			  const encTxn = algosdk.encodeMsgpack(expectedTxn);
-			  const decTxn = algosdk.decodeMsgpack(encTxn, algosdk.Transaction);
-			  expect(decTxn).toEqual(expectedTxn);
-		
-			  const encRep = expectedTxn.toEncodingData();
-			  const reencRep = decTxn.toEncodingData();
-			  expect(reencRep).toEqual(encRep);
+			expectedTxn.signTxn(keyPair.secretKey);
+
+			expectedTxn.group = algosdk.computeGroupID([expectedTxn]);
+			const encTxn = algosdk.encodeMsgpack(expectedTxn);
+			const decTxn = algosdk.decodeMsgpack(encTxn, algosdk.Transaction);
+			expect(decTxn).toEqual(expectedTxn);
+
+			const encRep = expectedTxn.toEncodingData();
+			const reencRep = decTxn.toEncodingData();
+			expect(reencRep).toEqual(encRep);
 		})
 
 		it("(OK) Encoding of transaction group", async () => {
@@ -371,19 +371,19 @@ describe("Algorand Encoding", () => {
 				type: algosdk.TransactionType.pay,
 				sender,
 				paymentParams: {
-				  receiver,
-				  amount,
+					receiver,
+					amount,
 				},
 				suggestedParams: {
-				  minFee: 100,
-				  fee,
-				  flatFee: true,
-				  firstValid: firstValidRound,
-				  lastValid: lastValidRound,
-				  genesisHash: algosdk.base64ToBytes(
-					genesisHashStr
-				  ),
-				  genesisID,
+					minFee: 100,
+					fee,
+					flatFee: true,
+					firstValid: firstValidRound,
+					lastValid: lastValidRound,
+					genesisHash: algosdk.base64ToBytes(
+						genesisHashStr
+					),
+					genesisID,
 				},
 			});
 
@@ -398,7 +398,7 @@ describe("Algorand Encoding", () => {
 
 			const bytesToSign: Uint8Array = expectedTxn.bytesToSign()
 			expect(modelsEncodedTx).toEqual(bytesToSign)
-		
+
 			expectedTxn.group = algosdk.computeGroupID([expectedTxn]);
 
 			// Compute correct group ID with models when signature is present on txns
@@ -443,7 +443,7 @@ describe("Algorand Encoding", () => {
 			const fee: number = 100000
 
 			const crafter: AlgorandTransactionCrafter = new AlgorandTransactionCrafter(genesisID, genesisHashStr)
-			
+
 			// Build pay transaction
 			const payTxn1: PayTransaction = crafter.pay(amount, sender1, receiver)
 				.addFirstValidRound(firstValidRound)
