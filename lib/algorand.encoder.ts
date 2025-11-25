@@ -65,15 +65,37 @@ export class AlgorandEncoder extends Encoder {
 	 * @internal
 	 */
 	static omitDefaultFields<T extends object>(obj: T): Partial<T> {
-		const cleaned: Record<string, unknown> = {}
-		const source = obj as Record<string, unknown>
-		for (const key of Object.keys(source)) {
-			const value = source[key]
-			if (value === undefined) continue
-			if (AlgorandEncoder.isDefaultValue(value)) continue
-			cleaned[key] = value
+		const traverse = (val: unknown): unknown => {
+			// Keep undefined values undefined
+			if (val === undefined) return undefined
+			// binary blobs: keep or drop as whole
+			if (val instanceof Uint8Array) {
+				return AlgorandEncoder.isDefaultValue(val) ? undefined : val
+			}
+			// "Primitive" values: keep or drop as whole
+			if (val === null || typeof val !== "object") {
+				return AlgorandEncoder.isDefaultValue(val) ? undefined : val
+			}
+			// Arrays: leave untouched to preserve order/indices.
+			if (Array.isArray(val)) {
+				return val
+			}
+			// Objects: traverse properties. E.g., inside AssetParams object.
+			const src = val as Record<string, unknown>
+			const out: Record<string, unknown> = {}
+			for (const key of Object.keys(src)) {
+				let v = traverse(src[key])
+				if (v === undefined) continue
+				if (key === "type") { // never remove discriminator
+					out[key] = v
+					continue
+				}
+				if (AlgorandEncoder.isDefaultValue(v)) continue
+				out[key] = v
+			}
+			return out
 		}
-		return cleaned as Partial<T>
+		return traverse(obj) as Partial<T>
 	}
 
 	/**
@@ -179,25 +201,24 @@ export class AlgorandEncoder extends Encoder {
 	}
 
 	/**
-	 * Checks if an entry is the default value and returns a boolean if that is the case.
+	 * Checks if an entry is the default value and returns true if that is the case.
 	 * @param value - The value of unknown type to be chedked
 	 * @returns boolean - true if the value is default, false otherwise
 	 * @throws Error if the value type is unsupported
 	*/
 	static isDefaultValue(value: unknown): boolean {
-		// zeroAddress check, equivalent to "AAA...AY5HFKQ"
 		if (value instanceof Uint8Array) {
+			if (value.length === 0) return true // Empty byte array is the default value for the Note field
 			if (value.length !== ALGORAND_PUBLIC_KEY_BYTE_LENGTH) return false
-			for (let i = 0; i < ALGORAND_PUBLIC_KEY_BYTE_LENGTH; i++) {
+			for (let i = 0; i < ALGORAND_PUBLIC_KEY_BYTE_LENGTH; i++) { // zeroAddress is default for Sender/Receiver fields
 				if (value[i] !== 0) return false
 			}
 			return true
 		}
 		if (typeof value === "number") return value === 0
 		if (typeof value === "bigint") return value === 0n
-		if (typeof value === "string") return value === ""
 		if (typeof value === "boolean") return value === false
-		// All other types (boolean, object, function, null, undefined) are never treated as default
+		// All other types (boolean, object, function, null, undefined) are not considered
 		return false
 	}
 }
