@@ -1,4 +1,4 @@
-import {AlgorandEncoder} from "./algorand.encoder.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
 
 /**
  * @category Common
@@ -22,7 +22,7 @@ export class AssetParams {
      *
      * True to freeze holdings for this asset by default.
      */
-    df?: boolean
+    df?: boolean | undefined
     /**
      * Unit Name
      *
@@ -113,7 +113,7 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
         return this
     }
     addDefaultFrozen(frozen: boolean): IAssetParamsBuilder {
-        this.params.df = frozen
+        this.params.df = frozen ? true : undefined
         return this
     }
     addUnitName(unitName: string): IAssetParamsBuilder {
@@ -125,7 +125,7 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
         return this
     }
     addMetadataHash(hash: Uint8Array): IAssetParamsBuilder {
-        this.params.am = hash
+        this.params.am = hash.every(b => b === 0) ? undefined : hash
         return this
     }
     addManagerAddress(address: string): IAssetParamsBuilder {

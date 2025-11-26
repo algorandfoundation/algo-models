@@ -68,7 +68,7 @@ export class KeyregTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IKeyregTxBuilder extends ITransactionHeaderBuilder<IKeyregTxBuilder>{
+export interface IKeyregTxBuilder extends ITransactionHeaderBuilder<IKeyregTxBuilder> {
 	/**
 	 * Add Participation PublicKey
 	 *
@@ -179,7 +179,7 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IKeyregTxBuilder {
-		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+		this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
 		return this
 	}
 	addRekey(rekey: string): IKeyregTxBuilder {

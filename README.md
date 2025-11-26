@@ -138,3 +138,15 @@ curl --request POST -i -H "X-Algo-API-Token: ``" -H "Content-Type: application/x
 ## Schemas for models
 
 Available in [schemas](./lib/schemas) folder
+
+
+## Note: Regarding "Default" Values
+
+In order to optimize the size of the produced msgpack encoding, a series of default values were defined for the various types. If a mandatory field contains a "default value" it must be omitted, because the algorand node will recreate that field with the default value in place.
+
+Example of default values:
+- BigInt: 0n
+- Address: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ (the Algorand Zero Address, i.e. [0, 0, 0, ..., 0])
+- Boolean: False
+
+If these are not omitted, attempting to sign and broadcast certain transactions will result in unexpected "signature failed to match" errors. E.g., a pay transaction with the amount field explicitly set to 0.

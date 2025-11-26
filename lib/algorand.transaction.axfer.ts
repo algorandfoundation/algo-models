@@ -14,14 +14,14 @@ export class AssetTransferTransaction extends TransactionHeader {
      *
      * The unique ID of the asset to be transferred.
      */
-    xaid: number | bigint
+    xaid: number | bigint | undefined
     /**
      * Asset Amount
      *
      * The amount of the asset to be transferred.
      * A zero amount transferred to self allocates that asset in the account's Asset map.
      */
-    aamt: number | bigint
+    aamt: number | bigint | undefined
     /**
      * Asset Sender
      *
@@ -36,7 +36,7 @@ export class AssetTransferTransaction extends TransactionHeader {
      *
      * The recipient of the asset transfer.
      */
-    arcv: Uint8Array
+    arcv: Uint8Array | undefined
     /**
      * Specify this field to remove the asset holding from the sender account and reduce the account's
      * minimum balance (i.e. opt-out of the asset).
@@ -52,7 +52,7 @@ export class AssetTransferTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IAssetTransferTxBuilder extends ITransactionHeaderBuilder<IAssetTransferTxBuilder>{
+export interface IAssetTransferTxBuilder extends ITransactionHeaderBuilder<IAssetTransferTxBuilder> {
     /**
      * Add Asset ID
      *
@@ -110,7 +110,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         return this
     }
     addAssetAmount(aamt: number | bigint): IAssetTransferTxBuilder {
-        if(BigInt(aamt)  !== 0n) {
+        if (BigInt(aamt) !== 0n) {
             this.tx.aamt = AlgorandEncoder.safeCastBigInt(aamt)
         }
         return this
@@ -144,7 +144,7 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetTransferTxBuilder {
-        this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+        this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
         return this
     }
     addRekey(address: string): IAssetTransferTxBuilder {

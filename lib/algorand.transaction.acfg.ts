@@ -37,7 +37,7 @@ export class AssetConfigTransaction extends TransactionHeader {
  * @see {@link AssetConfigTxBuilder}
  * @internal
  */
-export interface IAssetConfigTxBuilder extends ITransactionHeaderBuilder<IAssetConfigTxBuilder>{
+export interface IAssetConfigTxBuilder extends ITransactionHeaderBuilder<IAssetConfigTxBuilder> {
     /**
      * Add Asset ID
      *
@@ -84,7 +84,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.caid = AlgorandEncoder.safeCastBigInt(caid)
         return this
     }
-    addAssetParams(params: AssetParams): IAssetConfigTxBuilder{
+    addAssetParams(params: AssetParams): IAssetConfigTxBuilder {
         this.tx.apar = params
         return this
     }
@@ -104,8 +104,8 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
         return this
     }
-    addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetConfigTxBuilder {
-        this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+    addNote(note: string, encoding: BufferEncoding): IAssetConfigTxBuilder {
+        this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
         return this
     }
     addRekey(rekey: string): IAssetConfigTxBuilder {

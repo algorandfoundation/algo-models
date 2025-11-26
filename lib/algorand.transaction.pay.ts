@@ -1,5 +1,5 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js"
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * @category Transactions
@@ -15,13 +15,13 @@ export class PayTransaction extends TransactionHeader {
 	 *
 	 * The address of the account that receives the amount.
 	 */
-	rcv: Uint8Array
+	rcv: Uint8Array | undefined
 	/**
 	 * Amount
 	 *
 	 * The total amount to be sent in microAlgos.
 	 */
-	amt: bigint
+	amt: bigint | undefined
 
 	/**
 	 * Close Remainder To
@@ -42,7 +42,7 @@ export class PayTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IPayTxBuilder extends ITransactionHeaderBuilder<IPayTxBuilder>{
+export interface IPayTxBuilder extends ITransactionHeaderBuilder<IPayTxBuilder> {
 	/**
 	 * Add Receiver
 	 *
@@ -108,7 +108,7 @@ export class PayTxBuilder implements IPayTxBuilder {
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IPayTxBuilder {
-		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+		this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
 		return this
 	}
 	addRekey(rekey: string): IPayTxBuilder {

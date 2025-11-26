@@ -15,7 +15,7 @@ export class AssetFreezeTransaction extends TransactionHeader {
     /**
      * The address of the account whose asset is being frozen or unfrozen.
      */
-    fadd: Uint8Array
+    fadd: Uint8Array | undefined
     /**
      * The asset ID being frozen or unfrozen.
      */
@@ -36,7 +36,7 @@ export class AssetFreezeTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IAssetFreezeTxBuilder extends ITransactionHeaderBuilder<IAssetFreezeTxBuilder>{
+export interface IAssetFreezeTxBuilder extends ITransactionHeaderBuilder<IAssetFreezeTxBuilder> {
     /**
      * Add Freeze Account
      *
@@ -82,7 +82,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         return this
     }
     addFreezeAsset(faid: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.faid = AlgorandEncoder.safeCastBigInt(faid)
+        this.tx.faid = AlgorandEncoder.safeCastBigInt(faid)!
         return this
     }
     addAssetFrozen(afrz: boolean): IAssetFreezeTxBuilder {
@@ -106,7 +106,7 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetFreezeTxBuilder {
-        this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+        this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
         return this
     }
     addRekey(address: string): IAssetFreezeTxBuilder {

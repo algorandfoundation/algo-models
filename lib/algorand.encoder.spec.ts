@@ -304,7 +304,7 @@ describe("Algorand Encoding", () => {
 		expect(encodedAddress).toBe(addr)
 
 		// decode back to public key
-		const decodedPublicKey: Uint8Array = algoEncoder.decodeAddress(encodedAddress)
+		const decodedPublicKey: Uint8Array = algoEncoder.decodeAddress(encodedAddress)!
 		// match public keys
 		expect(decodedPublicKey).toEqual(publicKey)
 	})

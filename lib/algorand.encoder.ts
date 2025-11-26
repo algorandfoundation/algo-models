@@ -24,10 +24,11 @@ export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 export class AlgorandEncoder extends Encoder {
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
+	 * Returns undefined if the address is the zero address.
 	 * @param address - an Algorand address with checksum.
 	 * @returns the decoded form of the address's public key and checksum
 	 */
-	decodeAddress(address: string): Uint8Array {
+	decodeAddress(address: string): Uint8Array | undefined {
 		if (typeof address !== "string" || address.length !== ALGORAND_ADDRESS_LENGTH) throw new Error(MALFORMED_ADDRESS_ERROR_MSG)
 
 		// try to decode
@@ -36,6 +37,10 @@ export class AlgorandEncoder extends Encoder {
 		// Find publickey and checksum
 		const pk = new Uint8Array(decoded.slice(0, ALGORAND_ADDRESS_BYTE_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH))
 		const cs = new Uint8Array(decoded.slice(ALGORAND_PUBLIC_KEY_BYTE_LENGTH, ALGORAND_ADDRESS_BYTE_LENGTH))
+
+		// Check for the zero address. Return undefined to ensure msgpack omits the field.
+		// zeroAddress is a default value for Sender/Receiver fields
+		if (pk.every(b => b === 0)) return undefined
 
 		// Compute checksum
 		const checksum = sha512_256.array(pk).slice(HASH_BYTES_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH, HASH_BYTES_LENGTH)
@@ -60,53 +65,12 @@ export class AlgorandEncoder extends Encoder {
 	}
 
 	/**
-	 * Removes any own enumerable property whose value is considered a default.
-	 * Default criteria delegated to isDefaultValue. Undefined values are already ignored by msgpack.
-	 * @internal
-	 */
-	static omitDefaultFields<T extends object>(obj: T): Partial<T> {
-		const traverse = (val: unknown): unknown => {
-			// Keep undefined values undefined
-			if (val === undefined) return undefined
-			// binary blobs: keep or drop as whole
-			if (val instanceof Uint8Array) {
-				return AlgorandEncoder.isDefaultValue(val) ? undefined : val
-			}
-			// "Primitive" values: keep or drop as whole
-			if (val === null || typeof val !== "object") {
-				return AlgorandEncoder.isDefaultValue(val) ? undefined : val
-			}
-			// Arrays: leave untouched to preserve order/indices.
-			if (Array.isArray(val)) {
-				return val
-			}
-			// Objects: traverse properties. E.g., inside AssetParams object.
-			const src = val as Record<string, unknown>
-			const out: Record<string, unknown> = {}
-			for (const key of Object.keys(src)) {
-				let v = traverse(src[key])
-				if (v === undefined) continue
-				if (key === "type") { // never remove discriminator
-					out[key] = v
-					continue
-				}
-				if (AlgorandEncoder.isDefaultValue(v)) continue
-				out[key] = v
-			}
-			return out
-		}
-		return traverse(obj) as Partial<T>
-	}
-
-	/**
 	 * Encodes a signed transaction
 	 * @param stx
-	 * @param omitDefaults when true, drops default-valued fields from stx before encoding
 
 	 * @returns 
 	 */
-	encodeSignedTransaction(stx: object, omitDefaults = true): Uint8Array {
-		stx = omitDefaults ? AlgorandEncoder.omitDefaultFields(stx) as Transaction : stx
+	encodeSignedTransaction(stx: object): Uint8Array {
 		const encodedTxn: Uint8Array = new Uint8Array(msgpack.encode(stx, { sortKeys: true, ignoreUndefined: true }))
 		return encodedTxn
 	}
@@ -114,13 +78,10 @@ export class AlgorandEncoder extends Encoder {
 	/**
 	 * Encodes a transaction and prepares it for signing by adding the "TX" tag
 	 * @param tx
-	 * @param omitDefaults when true, drops default-valued fields before encoding
 	 */
-	encodeTransaction(tx: Transaction, omitDefaults = true): Uint8Array {
-		const working = omitDefaults ? AlgorandEncoder.omitDefaultFields(tx) : tx
-
+	encodeTransaction(tx: Transaction): Uint8Array {
 		// [TAG] [AMT] .... [NOTE] [RCV] [SND] [] [TYPE]
-		const encoded: Uint8Array = msgpack.encode(working, { sortKeys: true, ignoreUndefined: true })
+		const encoded: Uint8Array = msgpack.encode(tx, { sortKeys: true, ignoreUndefined: true })
 
 		// tag
 		const TAG: Buffer = Buffer.from("TX")
@@ -188,37 +149,34 @@ export class AlgorandEncoder extends Encoder {
 
 	/**
 	 * Casts a number or bigint to BigInt and checks if it's within the safe integer range.
+	 * If the value is 0, returns undefined to force msgpack to omit the field.
 	 * @param value - The number or bigint to be casted.
 	 * @returns The value as a BigInt.
 	 * @throws Error if the value is not within the safe integer range.
 	 */
-	static safeCastBigInt(value: number | bigint): bigint {
+	static safeCastBigInt(value: number | bigint): bigint | undefined {
 		const bigIntValue = BigInt(value)
 		if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
 			throw new Error("Value is not within the safe integer range")
 		}
+		if (bigIntValue === 0n) return undefined
 		return bigIntValue
 	}
 
 	/**
-	 * Checks if an entry is the default value and returns true if that is the case.
-	 * @param value - The value of unknown type to be chedked
-	 * @returns boolean - true if the value is default, false otherwise
-	 * @throws Error if the value type is unsupported
-	*/
-	static isDefaultValue(value: unknown): boolean {
-		if (value instanceof Uint8Array) {
-			if (value.length === 0) return true // Empty byte array is the default value for the Note field
-			if (value.length !== ALGORAND_PUBLIC_KEY_BYTE_LENGTH) return false
-			for (let i = 0; i < ALGORAND_PUBLIC_KEY_BYTE_LENGTH; i++) { // zeroAddress is default for Sender/Receiver fields
-				if (value[i] !== 0) return false
-			}
-			return true
+	 * Converts a note string to a Uint8Array.
+	 * Returns undefined if the note is empty, to force msgpack to omit the field.
+	 * @param note - the string value
+	 * @param encoding - the encoding (e.g. utf8, hex, base64, etc). UTF-8 by default.
+	 * @returns The Uint8Array bytes of the note field or undefined if the note is empty
+	 */
+	static readNoteField(note: string, encoding: BufferEncoding = "utf8"): Uint8Array | undefined {
+		const parsed = new Uint8Array(Buffer.from(note, encoding))
+
+		// if parsed = [], it's the default empty string value and should be omitted by msgpack
+		if (parsed.length === 0) {
+			return undefined
 		}
-		if (typeof value === "number") return value === 0
-		if (typeof value === "bigint") return value === 0n
-		if (typeof value === "boolean") return value === false
-		// All other types (boolean, object, function, null, undefined) are not considered
-		return false
+		return parsed
 	}
 }
