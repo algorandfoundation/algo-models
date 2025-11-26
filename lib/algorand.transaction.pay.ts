@@ -15,13 +15,13 @@ export class PayTransaction extends TransactionHeader {
 	 *
 	 * The address of the account that receives the amount.
 	 */
-	rcv: Uint8Array | undefined
+	rcv: Uint8Array
 	/**
 	 * Amount
 	 *
 	 * The total amount to be sent in microAlgos.
 	 */
-	amt: bigint | undefined
+	amt: bigint
 
 	/**
 	 * Close Remainder To
@@ -84,35 +84,43 @@ export class PayTxBuilder implements IPayTxBuilder {
 		return this
 	}
 	addAmount(amount: number | bigint): IPayTxBuilder {
-		this.tx.amt = AlgorandEncoder.safeCastBigInt(amount)
+		const safeCastAmount = AlgorandEncoder.safeCastBigInt(amount)
+		if (safeCastAmount !== 0n) { this.tx.amt = safeCastAmount }
 		return this
 	}
 	addCloseTo(close: string): IPayTxBuilder {
-		this.tx.close = this.encoder.decodeAddress(close)
+		const decodedClose = this.encoder.decodeAddress(close)
+		if (!decodedClose.every(b => b === 0)) { this.tx.close = decodedClose }
 		return this
 	}
 	addSender(sender: string): IPayTxBuilder {
-		this.tx.snd = this.encoder.decodeAddress(sender)
+		const decodedSender = this.encoder.decodeAddress(sender)
+		if (!decodedSender.every(b => b === 0)) { this.tx.snd = decodedSender }
 		return this
 	}
 	addFee(fee: number | bigint): IPayTxBuilder {
-		this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
+		const safeCastFee = AlgorandEncoder.safeCastBigInt(fee)
+		if (safeCastFee !== 0n) { this.tx.fee = safeCastFee } else { delete this.tx.fee }
 		return this
 	}
 	addFirstValidRound(fv: number | bigint): IPayTxBuilder {
-		this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
+		const safeCastFv = AlgorandEncoder.safeCastBigInt(fv)
+		if (safeCastFv !== 0n) { this.tx.fv = safeCastFv }
 		return this
 	}
 	addLastValidRound(lv: number | bigint): IPayTxBuilder {
-		this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
+		const safeCastLv = AlgorandEncoder.safeCastBigInt(lv)
+		if (safeCastLv !== 0n) { this.tx.lv = safeCastLv }
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IPayTxBuilder {
-		this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
+		const parsed = new Uint8Array(Buffer.from(note, encoding))
+		if (parsed.length !== 0) { this.tx.note = parsed }
 		return this
 	}
 	addRekey(rekey: string): IPayTxBuilder {
-		this.tx.rekey = this.encoder.decodeAddress(rekey)
+		const decodedRekey = this.encoder.decodeAddress(rekey)
+		if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
 		return this
 	}
 	addLease(lx: Uint8Array): IPayTxBuilder {

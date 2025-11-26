@@ -28,7 +28,7 @@ export class AlgorandEncoder extends Encoder {
 	 * @param address - an Algorand address with checksum.
 	 * @returns the decoded form of the address's public key and checksum
 	 */
-	decodeAddress(address: string): Uint8Array | undefined {
+	decodeAddress(address: string): Uint8Array {
 		if (typeof address !== "string" || address.length !== ALGORAND_ADDRESS_LENGTH) throw new Error(MALFORMED_ADDRESS_ERROR_MSG)
 
 		// try to decode
@@ -37,10 +37,6 @@ export class AlgorandEncoder extends Encoder {
 		// Find publickey and checksum
 		const pk = new Uint8Array(decoded.slice(0, ALGORAND_ADDRESS_BYTE_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH))
 		const cs = new Uint8Array(decoded.slice(ALGORAND_PUBLIC_KEY_BYTE_LENGTH, ALGORAND_ADDRESS_BYTE_LENGTH))
-
-		// Check for the zero address. Return undefined to ensure msgpack omits the field.
-		// zeroAddress is a default value for Sender/Receiver fields
-		if (pk.every(b => b === 0)) return undefined
 
 		// Compute checksum
 		const checksum = sha512_256.array(pk).slice(HASH_BYTES_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH, HASH_BYTES_LENGTH)
@@ -153,29 +149,11 @@ export class AlgorandEncoder extends Encoder {
 	 * @returns The value as a BigInt.
 	 * @throws Error if the value is not within the safe integer range.
 	 */
-	static safeCastBigInt(value: number | bigint): bigint | undefined {
+	static safeCastBigInt(value: number | bigint): bigint {
 		const bigIntValue = BigInt(value)
 		if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
 			throw new Error("Value is not within the safe integer range")
 		}
-		if (bigIntValue === 0n) return undefined
 		return bigIntValue
-	}
-
-	/**
-	 * Converts a note string to a Uint8Array.
-	 * Returns undefined if the note is empty, to force msgpack to omit the field.
-	 * @param note - the string value
-	 * @param encoding - the encoding (e.g. utf8, hex, base64, etc). UTF-8 by default.
-	 * @returns The Uint8Array bytes of the note field or undefined if the note is empty
-	 */
-	static readNoteField(note: string, encoding: BufferEncoding = "utf8"): Uint8Array | undefined {
-		const parsed = new Uint8Array(Buffer.from(note, encoding))
-
-		// if parsed = [], it's the default empty string value and should be omitted by msgpack
-		if (parsed.length === 0) {
-			return undefined
-		}
-		return parsed
 	}
 }

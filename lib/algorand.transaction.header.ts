@@ -32,25 +32,25 @@ export abstract class TransactionHeader {
      *
      * The address of the account that pays the fee and amount.
      */
-    snd: Uint8Array | undefined
+    snd: Uint8Array
     /**
      * Fee
      *
      * Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    fee: bigint | undefined
+    fee?: bigint
     /**
      * First Valid
      *
      * The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network.
      */
-    fv: bigint | undefined
+    fv: bigint
     /**
      * Last Valid
      *
      * The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network.
      */
-    lv: bigint | undefined
+    lv: bigint
     /**
      * Genesis Hash
      *
@@ -69,13 +69,13 @@ export abstract class TransactionHeader {
      *
      * Any data up to 1000 bytes.
      */
-    note?: Uint8Array | undefined
+    note?: Uint8Array
     /**
      * Rekey To
      *
      * Specifies the authorized address. This address will be used to authorize all future transactions.
      */
-    rekey?: Uint8Array | undefined
+    rekey?: Uint8Array
     /**
      * Lease
      *

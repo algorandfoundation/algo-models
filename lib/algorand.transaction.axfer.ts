@@ -14,14 +14,14 @@ export class AssetTransferTransaction extends TransactionHeader {
      *
      * The unique ID of the asset to be transferred.
      */
-    xaid: number | bigint | undefined
+    xaid: number | bigint
     /**
      * Asset Amount
      *
      * The amount of the asset to be transferred.
      * A zero amount transferred to self allocates that asset in the account's Asset map.
      */
-    aamt: number | bigint | undefined
+    aamt: number | bigint
     /**
      * Asset Sender
      *
@@ -36,7 +36,7 @@ export class AssetTransferTransaction extends TransactionHeader {
      *
      * The recipient of the asset transfer.
      */
-    arcv: Uint8Array | undefined
+    arcv: Uint8Array
     /**
      * Specify this field to remove the asset holding from the sender account and reduce the account's
      * minimum balance (i.e. opt-out of the asset).
@@ -106,45 +106,53 @@ export class AssetTransferTxBuilder implements IAssetTransferTxBuilder {
         this.tx.fee = 1000n
     }
     addAssetId(xaid: number | bigint): IAssetTransferTxBuilder {
-        this.tx.xaid = AlgorandEncoder.safeCastBigInt(xaid)
+        const safeCastXaid = AlgorandEncoder.safeCastBigInt(xaid)
+        if (safeCastXaid !== 0n) { this.tx.xaid = safeCastXaid }
         return this
     }
     addAssetAmount(aamt: number | bigint): IAssetTransferTxBuilder {
-        if (BigInt(aamt) !== 0n) {
-            this.tx.aamt = AlgorandEncoder.safeCastBigInt(aamt)
-        }
+        const safeAamount = AlgorandEncoder.safeCastBigInt(aamt)
+        if (safeAamount !== 0n) { this.tx.aamt = safeAamount }
         return this
     }
     addAssetSender(asnd: string): IAssetTransferTxBuilder {
-        this.tx.asnd = this.encoder.decodeAddress(asnd)
+        const decoded = this.encoder.decodeAddress(asnd)
+        if (!decoded.every(b => b === 0)) this.tx.asnd = decoded
         return this
     }
     addAssetReceiver(arcv: string): IAssetTransferTxBuilder {
-        this.tx.arcv = this.encoder.decodeAddress(arcv)
+        const decoded = this.encoder.decodeAddress(arcv)
+        if (!decoded.every(b => b === 0)) this.tx.arcv = decoded
         return this
     }
     addAssetCloseTo(aclose: string): IAssetTransferTxBuilder {
-        this.tx.aclose = this.encoder.decodeAddress(aclose)
+        const decoded = this.encoder.decodeAddress(aclose)
+        if (!decoded.every(b => b === 0)) this.tx.aclose = decoded
         return this
     }
     addSender(sender: string): IAssetTransferTxBuilder {
-        this.tx.snd = this.encoder.decodeAddress(sender)
+        const decoded = this.encoder.decodeAddress(sender)
+        if (!decoded.every(b => b === 0)) this.tx.snd = decoded
         return this
     }
     addFee(fee: number | bigint): IAssetTransferTxBuilder {
-        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
+        const safeFee = AlgorandEncoder.safeCastBigInt(fee)
+        if (safeFee !== 0n) { this.tx.fee = safeFee } else { delete this.tx.fee }
         return this
     }
-    addFirstValidRound(firstValid: number | bigint): IAssetTransferTxBuilder {
-        this.tx.fv = AlgorandEncoder.safeCastBigInt(firstValid)
+    addFirstValidRound(fv: number | bigint): IAssetTransferTxBuilder {
+        const safeCastFv = AlgorandEncoder.safeCastBigInt(fv)
+        if (safeCastFv !== 0n) { this.tx.fv = safeCastFv }
         return this
     }
-    addLastValidRound(lastValid: number | bigint): IAssetTransferTxBuilder {
-        this.tx.lv = AlgorandEncoder.safeCastBigInt(lastValid)
+    addLastValidRound(lv: number | bigint): IAssetTransferTxBuilder {
+        const safeCastLv = AlgorandEncoder.safeCastBigInt(lv)
+        if (safeCastLv !== 0n) { this.tx.lv = safeCastLv }
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetTransferTxBuilder {
-        this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
+        const parsed = new Uint8Array(Buffer.from(note, encoding))
+        if (parsed.length !== 0) { this.tx.note = parsed }
         return this
     }
     addRekey(address: string): IAssetTransferTxBuilder {

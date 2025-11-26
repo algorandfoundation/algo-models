@@ -81,7 +81,8 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.fee = 1000n
     }
     addAssetId(caid: number | bigint): IAssetConfigTxBuilder {
-        this.tx.caid = AlgorandEncoder.safeCastBigInt(caid)
+        const safeCastCaid = AlgorandEncoder.safeCastBigInt(caid)
+        if (safeCastCaid !== 0n) { this.tx.caid = safeCastCaid }
         return this
     }
     addAssetParams(params: AssetParams): IAssetConfigTxBuilder {
@@ -89,23 +90,28 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         return this
     }
     addSender(sender: string): IAssetConfigTxBuilder {
-        this.tx.snd = this.encoder.decodeAddress(sender)
+        const decoded = this.encoder.decodeAddress(sender)
+        if (!decoded.every(b => b === 0)) this.tx.snd = decoded
         return this
     }
     addFee(fee: number | bigint): IAssetConfigTxBuilder {
-        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
+        const safeFee = AlgorandEncoder.safeCastBigInt(fee)
+        if (safeFee !== 0n) { this.tx.fee = safeFee } else { delete this.tx.fee }
         return this
     }
     addFirstValidRound(fv: number | bigint): IAssetConfigTxBuilder {
-        this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
+        const safeCastFv = AlgorandEncoder.safeCastBigInt(fv)
+        if (safeCastFv !== 0n) { this.tx.fv = safeCastFv }
         return this
     }
     addLastValidRound(lv: number | bigint): IAssetConfigTxBuilder {
-        this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
+        const safeCastLv = AlgorandEncoder.safeCastBigInt(lv)
+        if (safeCastLv !== 0n) { this.tx.lv = safeCastLv }
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetConfigTxBuilder {
-        this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
+        const parsed = new Uint8Array(Buffer.from(note, encoding))
+        if (parsed.length !== 0) { this.tx.note = parsed }
         return this
     }
     addRekey(rekey: string): IAssetConfigTxBuilder {

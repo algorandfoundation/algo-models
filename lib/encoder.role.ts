@@ -1,7 +1,7 @@
 export abstract class Encoder {
 	constructor() { }
 
-	abstract decodeAddress(address: string): Uint8Array | undefined
+	abstract decodeAddress(address: string): Uint8Array
 	abstract encodeAddress(publicKey: Buffer): string
 	abstract encodeSignedTransaction(txn: object): Uint8Array
 	abstract decodeSignedTransaction(encoded: Uint8Array): object | Error
