@@ -104,7 +104,7 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
         return this
     }
-    addNote(note: string, encoding: BufferEncoding): IAssetConfigTxBuilder {
+    addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetConfigTxBuilder {
         this.tx.note = AlgorandEncoder.readNoteField(note, encoding)
         return this
     }

@@ -1,4 +1,4 @@
-import { algo, AlgorandClient, waitForConfirmation } from '@algorandfoundation/algokit-utils'
+import { AlgorandClient, waitForConfirmation } from '@algorandfoundation/algokit-utils'
 import { AlgorandEncoder, AlgorandTransactionCrafter, AssetConfigTransaction, AssetParamsBuilder } from "./index";
 import { Address, SuggestedParams } from "algosdk";
 import { SigningAccount, TransactionSignerAccount } from "@algorandfoundation/algokit-utils/types/account";

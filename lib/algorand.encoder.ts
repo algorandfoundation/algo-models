@@ -66,9 +66,8 @@ export class AlgorandEncoder extends Encoder {
 
 	/**
 	 * Encodes a signed transaction
-	 * @param stx
-
-	 * @returns 
+	 * @param stx - The signed transaction object to encode.
+	 * @returns The encoded signed transaction as a Uint8Array
 	 */
 	encodeSignedTransaction(stx: object): Uint8Array {
 		const encodedTxn: Uint8Array = new Uint8Array(msgpack.encode(stx, { sortKeys: true, ignoreUndefined: true }))
