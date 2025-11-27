@@ -83,7 +83,8 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         return this
     }
     addFreezeAsset(faid: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.faid = AlgorandEncoder.safeCastBigInt(faid)!
+        const safeCastFaid = AlgorandEncoder.safeCastBigInt(faid)
+        if (safeCastFaid !== 0n) { this.tx.faid = safeCastFaid }
         return this
     }
     addAssetFrozen(afrz: boolean): IAssetFreezeTxBuilder {

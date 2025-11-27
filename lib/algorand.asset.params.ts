@@ -105,7 +105,6 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
     }
 
     addTotal(total: number | bigint): IAssetParamsBuilder {
-
         this.params.t = AlgorandEncoder.safeCastBigInt(total)
         return this
     }

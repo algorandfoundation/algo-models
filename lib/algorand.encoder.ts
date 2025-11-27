@@ -24,7 +24,6 @@ export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 export class AlgorandEncoder extends Encoder {
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
-	 * Returns undefined if the address is the zero address.
 	 * @param address - an Algorand address with checksum.
 	 * @returns the decoded form of the address's public key and checksum
 	 */
@@ -144,7 +143,7 @@ export class AlgorandEncoder extends Encoder {
 
 	/**
 	 * Casts a number or bigint to BigInt and checks if it's within the safe integer range.
-	 * If the value is 0, returns undefined to force msgpack to omit the field.
+	 * Always returns a BigInt. Omission of default values (such as 0n) is handled in the calling code.
 	 * @param value - The number or bigint to be casted.
 	 * @returns The value as a BigInt.
 	 * @throws Error if the value is not within the safe integer range.
