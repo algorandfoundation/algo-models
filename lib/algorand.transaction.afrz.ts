@@ -116,8 +116,9 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         if (parsed.length !== 0) { this.tx.note = parsed }
         return this
     }
-    addRekey(address: string): IAssetFreezeTxBuilder {
-        this.tx.rekey = this.encoder.decodeAddress(address)
+    addRekey(rekey: string): IAssetFreezeTxBuilder {
+        const decodedRekey = this.encoder.decodeAddress(rekey)
+        if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
         return this
     }
     addLease(lease: Uint8Array): IAssetFreezeTxBuilder {

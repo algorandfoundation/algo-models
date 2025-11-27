@@ -115,7 +115,8 @@ export class AssetConfigTxBuilder implements IAssetConfigTxBuilder {
         return this
     }
     addRekey(rekey: string): IAssetConfigTxBuilder {
-        this.tx.rekey = this.encoder.decodeAddress(rekey)
+        const decodedRekey = this.encoder.decodeAddress(rekey)
+        if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
         return this
     }
     addLease(lx: Uint8Array): IAssetConfigTxBuilder {

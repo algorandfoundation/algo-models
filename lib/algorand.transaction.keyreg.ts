@@ -190,8 +190,9 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		if (parsed.length !== 0) { this.tx.note = parsed }
 		return this
 	}
-	addRekey(address: string): IKeyregTxBuilder {
-		this.tx.rekey = this.encoder.decodeAddress(address)
+	addRekey(rekey: string): IKeyregTxBuilder {
+		const decodedRekey = this.encoder.decodeAddress(rekey)
+		if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
 		return this
 	}
 	addLease(lease: Uint8Array): IKeyregTxBuilder {

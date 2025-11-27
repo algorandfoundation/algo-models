@@ -56,13 +56,13 @@ describe("Algorand Transaction Crafter", () => {
 	) {
 		const { snd, note, grp, lx, fee, fv, lv } = transactionHeader
 		return builder
-			.addSender(algoEncoder.encodeAddress(Buffer.from(snd!)))
-			.addFirstValidRound(fv!)
-			.addLastValidRound(lv!)
+			.addSender(algoEncoder.encodeAddress(Buffer.from(snd)))
+			.addFirstValidRound(fv)
+			.addLastValidRound(lv)
 			.addNote(Buffer.from(note!).toString("base64"), "base64")
 			.addFee(fee!)
 			.addGroup(grp!)
-			.addRekey(algoEncoder.encodeAddress(Buffer.from(snd!)))
+			.addRekey(algoEncoder.encodeAddress(Buffer.from(snd)))
 			.addLease(lx!)
 	}
 
