@@ -15,13 +15,13 @@ export class PayTransaction extends TransactionHeader {
 	 *
 	 * The address of the account that receives the amount.
 	 */
-	rcv: Uint8Array
+	rcv?: Uint8Array
 	/**
 	 * Amount
 	 *
 	 * The total amount to be sent in microAlgos.
 	 */
-	amt: bigint
+	amt?: bigint
 
 	/**
 	 * Close Remainder To

@@ -32,7 +32,7 @@ export abstract class TransactionHeader {
      *
      * The address of the account that pays the fee and amount.
      */
-    snd: Uint8Array
+    snd?: Uint8Array
     /**
      * Fee
      *
@@ -44,13 +44,13 @@ export abstract class TransactionHeader {
      *
      * The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network.
      */
-    fv: bigint
+    fv?: bigint
     /**
      * Last Valid
      *
      * The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network.
      */
-    lv: bigint
+    lv?: bigint
     /**
      * Genesis Hash
      *

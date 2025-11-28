@@ -21,7 +21,7 @@ export class AssetTransferTransaction extends TransactionHeader {
      * The amount of the asset to be transferred.
      * A zero amount transferred to self allocates that asset in the account's Asset map.
      */
-    aamt: number | bigint
+    aamt?: number | bigint
     /**
      * Asset Sender
      *
@@ -36,7 +36,7 @@ export class AssetTransferTransaction extends TransactionHeader {
      *
      * The recipient of the asset transfer.
      */
-    arcv: Uint8Array
+    arcv?: Uint8Array
     /**
      * Specify this field to remove the asset holding from the sender account and reduce the account's
      * minimum balance (i.e. opt-out of the asset).
