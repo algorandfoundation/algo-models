@@ -142,7 +142,7 @@ Available in [schemas](./lib/schemas) folder
 
 ## Note: Regarding "Default" Values
 
-In order to optimize the size of the produced msgpack encoding, a series of default values were defined for the various types. If a mandatory field contains a "default value" it must be omitted, because the algorand node will recreate that field with the default value in place.
+In order to optimize the size of the produced msgpack encoding, a series of default values were defined for the various types. If a field contains a "default value" it must be omitted from the msgpack encoding, because the algorand node will recreate that field with the default value in place.
 
 Example of default values:
 - BigInt: 0n
