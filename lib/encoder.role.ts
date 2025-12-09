@@ -1,5 +1,5 @@
 export abstract class Encoder {
-	constructor() {}
+	constructor() { }
 
 	abstract decodeAddress(address: string): Uint8Array
 	abstract encodeAddress(publicKey: Buffer): string

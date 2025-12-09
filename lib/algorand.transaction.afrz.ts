@@ -36,7 +36,7 @@ export class AssetFreezeTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IAssetFreezeTxBuilder extends ITransactionHeaderBuilder<IAssetFreezeTxBuilder>{
+export interface IAssetFreezeTxBuilder extends ITransactionHeaderBuilder<IAssetFreezeTxBuilder> {
     /**
      * Add Freeze Account
      *
@@ -78,39 +78,47 @@ export class AssetFreezeTxBuilder implements IAssetFreezeTxBuilder {
         this.tx.fee = 1000n
     }
     addFreezeAccount(fadd: string): IAssetFreezeTxBuilder {
-        this.tx.fadd = this.encoder.decodeAddress(fadd)
+        const decoded = this.encoder.decodeAddress(fadd)
+        if (!decoded.every(b => b === 0)) this.tx.fadd = decoded
         return this
     }
     addFreezeAsset(faid: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.faid = AlgorandEncoder.safeCastBigInt(faid)
+        const safeCastFaid = AlgorandEncoder.safeCastBigInt(faid)
+        if (safeCastFaid !== 0n) { this.tx.faid = safeCastFaid }
         return this
     }
     addAssetFrozen(afrz: boolean): IAssetFreezeTxBuilder {
-        this.tx.afrz = afrz
+        if (afrz) this.tx.afrz = afrz
         return this
     }
     addSender(sender: string): IAssetFreezeTxBuilder {
-        this.tx.snd = this.encoder.decodeAddress(sender)
+        const decoded = this.encoder.decodeAddress(sender)
+        if (!decoded.every(b => b === 0)) this.tx.snd = decoded
         return this
     }
     addFee(fee: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
+        const safeFee = AlgorandEncoder.safeCastBigInt(fee)
+        if (safeFee !== 0n) { this.tx.fee = safeFee } else { delete this.tx.fee }
         return this
     }
-    addFirstValidRound(firstValid: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.fv = AlgorandEncoder.safeCastBigInt(firstValid)
+    addFirstValidRound(fv: number | bigint): IAssetFreezeTxBuilder {
+        const safeCastFv = AlgorandEncoder.safeCastBigInt(fv)
+        if (safeCastFv !== 0n) { this.tx.fv = safeCastFv }
         return this
     }
-    addLastValidRound(lastValid: number | bigint): IAssetFreezeTxBuilder {
-        this.tx.lv = AlgorandEncoder.safeCastBigInt(lastValid)
+    addLastValidRound(lv: number | bigint): IAssetFreezeTxBuilder {
+        const safeCastLv = AlgorandEncoder.safeCastBigInt(lv)
+        if (safeCastLv !== 0n) { this.tx.lv = safeCastLv }
         return this
     }
     addNote(note: string, encoding: BufferEncoding = "utf8"): IAssetFreezeTxBuilder {
-        this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+        const parsed = new Uint8Array(Buffer.from(note, encoding))
+        if (parsed.length !== 0) { this.tx.note = parsed }
         return this
     }
-    addRekey(address: string): IAssetFreezeTxBuilder {
-        this.tx.rekey = this.encoder.decodeAddress(address)
+    addRekey(rekey: string): IAssetFreezeTxBuilder {
+        const decodedRekey = this.encoder.decodeAddress(rekey)
+        if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
         return this
     }
     addLease(lease: Uint8Array): IAssetFreezeTxBuilder {

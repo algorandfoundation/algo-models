@@ -1,4 +1,4 @@
-import {AlgorandEncoder} from "./algorand.encoder.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
 
 /**
  * @category Common
@@ -9,7 +9,7 @@ export class AssetParams {
      *
      * The total number of base units of the asset to create. This number cannot be changed.
      */
-    t?: bigint | undefined
+    t?: bigint
     /**
      * Decimals
      *
@@ -109,11 +109,12 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
         return this
     }
     addDecimals(decimals: number | bigint): IAssetParamsBuilder {
-        this.params.dc = AlgorandEncoder.safeCastBigInt(decimals)
+        const safeCastDecimals = AlgorandEncoder.safeCastBigInt(decimals)
+        if (safeCastDecimals !== 0n) this.params.dc = safeCastDecimals
         return this
     }
     addDefaultFrozen(frozen: boolean): IAssetParamsBuilder {
-        this.params.df = frozen
+        if (frozen) this.params.df = true
         return this
     }
     addUnitName(unitName: string): IAssetParamsBuilder {
@@ -125,23 +126,27 @@ export class AssetParamsBuilder implements IAssetParamsBuilder {
         return this
     }
     addMetadataHash(hash: Uint8Array): IAssetParamsBuilder {
-        this.params.am = hash
+        if (!hash.every(b => b === 0)) { this.params.am = hash }
         return this
     }
     addManagerAddress(address: string): IAssetParamsBuilder {
-        this.params.m = this.encoder.decodeAddress(address)
+        const decodedManager = this.encoder.decodeAddress(address)
+        if (!decodedManager.every(b => b === 0)) { this.params.m = decodedManager }
         return this
     }
     addReserveAddress(address: string): IAssetParamsBuilder {
-        this.params.r = this.encoder.decodeAddress(address)
+        const decodedReserve = this.encoder.decodeAddress(address)
+        if (!decodedReserve.every(b => b === 0)) { this.params.r = decodedReserve }
         return this
     }
     addFreezeAddress(address: string): IAssetParamsBuilder {
-        this.params.f = this.encoder.decodeAddress(address)
+        const decodedFreeze = this.encoder.decodeAddress(address)
+        if (!decodedFreeze.every(b => b === 0)) { this.params.f = decodedFreeze }
         return this
     }
     addClawbackAddress(address: string): IAssetParamsBuilder {
-        this.params.c = this.encoder.decodeAddress(address)
+        const decodedClawback = this.encoder.decodeAddress(address)
+        if (!decodedClawback.every(b => b === 0)) { this.params.c = decodedClawback }
         return this
     }
     get() {

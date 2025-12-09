@@ -4,16 +4,16 @@ import * as msgpack from "algo-msgpack-with-bigint"
 import { AlgorandTransactionCrafter } from "./algorand.transaction.crafter"
 import { PayTransaction } from "./algorand.transaction.pay"
 import { KeyregTransaction } from "./algorand.transaction.keyreg"
-import Ajv, {type JSONSchemaType} from "ajv"
+import Ajv, { type JSONSchemaType } from "ajv"
 import addFormat from 'ajv-formats'
 import addKeywords from 'ajv-keywords'
 import path from "path"
 import fs from 'fs'
-import {AssetConfigTransaction} from "./algorand.transaction.acfg";
-import {AssetParamsBuilder} from "./algorand.asset.params";
-import {AssetTransferTransaction} from "./algorand.transaction.axfer";
-import {AssetFreezeTransaction} from "./algorand.transaction.afrz";
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header";
+import { AssetConfigTransaction } from "./algorand.transaction.acfg";
+import { AssetParamsBuilder } from "./algorand.asset.params";
+import { AssetTransferTransaction } from "./algorand.transaction.axfer";
+import { AssetFreezeTransaction } from "./algorand.transaction.afrz";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header";
 
 
 // Setup Validator
@@ -23,18 +23,18 @@ addFormat(ajv)
 // Define the custom keyword 'typeof'
 ajv.addKeyword({
 	keyword: 'typeof',
-	validate: function(schema: string, data: any) {
-	  if (schema === 'bigint') {
-		return typeof data === 'bigint';
-	  }
-	  
-	  console.log("Unknown type: ", schema)
+	validate: function (schema: string, data: any) {
+		if (schema === 'bigint') {
+			return typeof data === 'bigint';
+		}
 
-	  // Add more types as needed
-	  return false;
+		console.log("Unknown type: ", schema)
+
+		// Add more types as needed
+		return false;
 	},
 	errors: false
-  });
+});
 
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/bytes32.json"), "utf8")))
 ajv.addSchema(JSON.parse(fs.readFileSync(path.resolve(__dirname, "schemas/bytes64.json"), "utf8")))
@@ -53,17 +53,17 @@ describe("Algorand Transaction Crafter", () => {
 	let transactionHeader: Omit<TransactionHeader, "type">
 	function withTestTransactionHeader<T extends ITransactionHeaderBuilder<T>>(
 		builder: ITransactionHeaderBuilder<T>
-	){
-		const {snd, note, grp, lx, fee, fv, lv} = transactionHeader
+	) {
+		const { snd, note, grp, lx, fee, fv, lv } = transactionHeader
 		return builder
-			.addSender(algoEncoder.encodeAddress(Buffer.from(snd)))
-			.addFirstValidRound(fv)
-			.addLastValidRound(lv)
-			.addNote(Buffer.from(note!!).toString("base64"), "base64")
-			.addFee(fee)
-			.addGroup(grp!!)
-			.addRekey(algoEncoder.encodeAddress(Buffer.from(snd)))
-			.addLease(lx!!)
+			.addSender(algoEncoder.encodeAddress(Buffer.from(snd!)))
+			.addFirstValidRound(fv!)
+			.addLastValidRound(lv!)
+			.addNote(Buffer.from(note!).toString("base64"), "base64")
+			.addFee(fee!)
+			.addGroup(grp!)
+			.addRekey(algoEncoder.encodeAddress(Buffer.from(snd!)))
+			.addLease(lx!)
 	}
 
 	beforeEach(async () => {
@@ -115,7 +115,7 @@ describe("Algorand Transaction Crafter", () => {
 
 		it("(OK) Craft Pay Transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 			// to algorand address
 			const to: string = algoEncoder.encodeAddress(Buffer.from(randomBytes(32)))
 
@@ -146,7 +146,7 @@ describe("Algorand Transaction Crafter", () => {
 
 		it("(OK) Craft Keyreg change-online transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// vote key
 			const voteKey: string = Buffer.from(randomBytes(32)).toString("base64")
@@ -187,7 +187,7 @@ describe("Algorand Transaction Crafter", () => {
 
 		it("(OK) Craft Keyreg change-offline transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// create keyreg transaction
 			const txn: KeyregTransaction = withTestTransactionHeader(algorandCrafter
@@ -214,7 +214,7 @@ describe("Algorand Transaction Crafter", () => {
 		})
 		it("(OK) Craft Keyreg non-participation transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// note
 			const note: string = Buffer.from(randomBytes(32)).toString("base64")
@@ -248,19 +248,16 @@ describe("Algorand Transaction Crafter", () => {
 		})
 		it("(OK) Craft Asset Config create transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			const params = new AssetParamsBuilder()
 				.addTotal(1)
 				.addDecimals(1)
-				.addDefaultFrozen(false)
 				.addAssetName("Big Yeetus")
 				.addUnitName("YEET")
-				.addMetadataHash(randomBytes(32))
 				.addClawbackAddress(from)
 				.addFreezeAddress(from)
 				.addManagerAddress(from)
-				.addReserveAddress(from)
 				.get()
 
 			// create asset transaction
@@ -280,10 +277,28 @@ describe("Algorand Transaction Crafter", () => {
 
 			const validate = ajv.compile(assetConfigSchema)
 			expect(validate(txn)).toBe(true)
+
+
+			// Test that encoding is the same when some fields are explicitly set to their default values 
+			const params2 = new AssetParamsBuilder()
+				.addTotal(1)
+				.addDecimals(1)
+				.addDefaultFrozen(false) // explicitly set to default value
+				.addAssetName("Big Yeetus")
+				.addUnitName("YEET")
+				.addMetadataHash(new Uint8Array(32)) // explicitly set to all zero hash
+				.addClawbackAddress(from)
+				.addFreezeAddress(from)
+				.addManagerAddress(from)
+				.addReserveAddress("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ") // explicitly set to Zero Address
+				.get()
+
+			const txn2 = withTestTransactionHeader(algorandCrafter.createAsset(from, params2)).get()
+			expect(txn.encode()).toEqual(txn2.encode())
 		})
 		it("(OK) Craft AssetConfig destroy transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// destroy asset config
 			const txn: AssetConfigTransaction = withTestTransactionHeader(
@@ -312,7 +327,7 @@ describe("Algorand Transaction Crafter", () => {
 		})
 		it("(OK) Craft Asset Freeze transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// create freeze transaction
 			const txn: AssetFreezeTransaction = withTestTransactionHeader(
@@ -342,7 +357,7 @@ describe("Algorand Transaction Crafter", () => {
 		})
 		it("(OK) Craft Asset Transfer transaction", async () => {
 			// from algorand address
-			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd))
+			const from: string = algoEncoder.encodeAddress(Buffer.from(transactionHeader.snd!))
 
 			// create transfer transaction
 			const txn: AssetTransferTransaction = withTestTransactionHeader(
