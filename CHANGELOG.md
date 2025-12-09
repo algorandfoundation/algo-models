@@ -1,3 +1,16 @@
+# [1.0.0-canary.6](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.5...v1.0.0-canary.6) (2025-12-09)
+
+
+### Bug Fixes
+
+* address rekey ([e7efcd6](https://github.com/algorandfoundation/algo-models/commit/e7efcd634fb94ad1517552a9c173cb42f2ddd595))
+* allow for the undefined type and rely on msgpack to omit those fields ([c106e6e](https://github.com/algorandfoundation/algo-models/commit/c106e6ef41ec15a87189146a34b7ecd7dc43034b))
+* apply suggestions from code review ([ca4036d](https://github.com/algorandfoundation/algo-models/commit/ca4036dff89a091acca2954b697c6e1c34281dab))
+* consider nested boolean ([f8773f4](https://github.com/algorandfoundation/algo-models/commit/f8773f41e974b0e1a8e7a6b83d912782c04fe134))
+* omit default values entirely from msgpack ([360bbaf](https://github.com/algorandfoundation/algo-models/commit/360bbaf6518411a77d20f23bd7ab863dc3bcaa72))
+* optional ([7ab9d57](https://github.com/algorandfoundation/algo-models/commit/7ab9d571b9d1699941268c43e119c9a629e43539))
+* remove undefined type and simply ensure default values are never set ([ccaa64d](https://github.com/algorandfoundation/algo-models/commit/ccaa64dd66bb17f21aaf907dbe24a914a283acef))
+
 # [1.0.0-canary.5](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.4...v1.0.0-canary.5) (2025-07-24)
 
 
