@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://algo-models.com/schemas/state.schema.json",
+  "title": "State Schema",
+  "type": "object",
+  "properties": {
+    "nui": {
+      "typeof": "bigint",
+      "description": "Maximum number of integer values that may be stored in the [global || local] application key/value store."
+    },
+    "nbs": {
+      "typeof": "bigint",
+      "description": "Maximum number of byte slices values that may be stored in the [global || local] application key/value store."
+    }
+  }
+}

@@ -3,6 +3,7 @@ import {AssetConfigTransaction} from "./algorand.transaction.acfg.js";
 import {AssetTransferTransaction} from "./algorand.transaction.axfer.js";
 import {AssetFreezeTransaction} from "./algorand.transaction.afrz.js";
 import {KeyregTransaction} from "./algorand.transaction.keyreg.js";
+import {ApplicationCallTransaction} from "./algorand.transaction.appl";
 
 /**
  * Transaction Alias
@@ -11,7 +12,7 @@ import {KeyregTransaction} from "./algorand.transaction.keyreg.js";
  *
  * @category Common
  */
-export type Transaction = PayTransaction | AssetConfigTransaction | AssetTransferTransaction | AssetFreezeTransaction | KeyregTransaction
+export type Transaction = PayTransaction | AssetConfigTransaction | AssetTransferTransaction | AssetFreezeTransaction | KeyregTransaction | ApplicationCallTransaction
 
 // SignedTransaction
 export interface SignedTransaction {

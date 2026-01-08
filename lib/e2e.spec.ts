@@ -1,10 +1,16 @@
-import { AlgorandClient, waitForConfirmation } from '@algorandfoundation/algokit-utils'
-import { AlgorandEncoder, AlgorandTransactionCrafter, AssetConfigTransaction, AssetParamsBuilder } from "./index";
-import { Address, SuggestedParams } from "algosdk";
-import { SigningAccount, TransactionSignerAccount } from "@algorandfoundation/algokit-utils/types/account";
-import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
-import { encode } from "hi-base32";
-import { sha512_256 } from "js-sha512";
+import {AlgorandClient, waitForConfirmation} from '@algorandfoundation/algokit-utils'
+import {
+  AlgorandTransactionCrafter,
+  ApplicationCallTxBuilder,
+  AssetConfigTransaction,
+  AssetParamsBuilder, 
+} from "./index";
+import {Address, SuggestedParams} from "algosdk";
+import {SigningAccount, TransactionSignerAccount} from "@algorandfoundation/algokit-utils/types/account";
+import {AlgoAmount} from "@algorandfoundation/algokit-utils/types/amount";
+import {encode} from "hi-base32";
+import {sha512_256} from "js-sha512";
+import {Arc56Contract} from "@algorandfoundation/algokit-utils/types/app-arc56";
 
 export type KeyPairRecord = {
   id: string
@@ -61,9 +67,10 @@ export function generateChecksum(publicKey: Uint8Array) {
     );
 }
 
-
-
 describe('Algorand Transaction Crafter', () => {
+  let genesisId: string
+  let genesisHash: string
+
   let algorand: AlgorandClient
   let deployer: Address & TransactionSignerAccount & {
     account: SigningAccount;
@@ -76,7 +83,7 @@ describe('Algorand Transaction Crafter', () => {
 
   beforeAll(async () => {
     algorand = AlgorandClient.fromEnvironment()
-    deployer = await algorand.account.fromEnvironment('DEPLOYER')
+    deployer = await algorand.account.fromEnvironment('DEPLOYER', new AlgoAmount({algos: 10000}))
 
     masterKeyPair = await generateKey()
     secondaryKeyPair = await generateKey()
@@ -85,7 +92,9 @@ describe('Algorand Transaction Crafter', () => {
     await algorand.account.ensureFunded(secondaryKeyPair.id, deployer, new AlgoAmount({ algos: 10 }))
 
     params = await algorand.getSuggestedParams()
-    algorandCrafter = new AlgorandTransactionCrafter(params.genesisID as string, Buffer.from(params.genesisHash as Uint8Array).toString('base64'))
+    genesisId = params.genesisID as string
+    genesisHash = Buffer.from(params.genesisHash as Uint8Array).toString('base64')
+    algorandCrafter = new AlgorandTransactionCrafter(genesisId, genesisHash)
   }, 10000)
 
   it("(OK) Pay Transaction", async () => {
@@ -239,70 +248,153 @@ describe('Algorand Transaction Crafter', () => {
     const destroyResult = await algorand.client.algod.sendRawTransaction(destroySigned).do()
     await waitForConfirmation(destroyResult.txid, 20, algorand.client.algod)
   })
+  it("(OK Application Create/Delete) App Calls with appSpec", async ()=>{
+    const appSpec = {
+      "name": "HelloWorld",
+      "structs": {},
+      "methods": [
+        {
+          "name": "hello",
+          "args": [
+            {
+              "type": "string",
+              "name": "name"
+            }
+          ],
+          "returns": {
+            "type": "string"
+          },
+          "actions": {
+            "create": [],
+            "call": [
+              "NoOp"
+            ]
+          },
+          "readonly": false,
+          "events": [],
+          "recommendations": {}
+        }
+      ],
+      "arcs": [
+        22,
+        28
+      ],
+      "networks": {},
+      "state": {
+        "schema": {
+          "global": {
+            "ints": 0,
+            "bytes": 0
+          },
+          "local": {
+            "ints": 0,
+            "bytes": 0
+          }
+        },
+        "keys": {
+          "global": {},
+          "local": {},
+          "box": {}
+        },
+        "maps": {
+          "global": {},
+          "local": {},
+          "box": {}
+        }
+      },
+      "bareActions": {
+        "create": [
+          "NoOp"
+        ],
+        "call": []
+      },
+      "sourceInfo": {
+        "approval": {
+          "sourceInfo": [
+            {
+              "pc": [
+                25
+              ],
+              "errorMessage": "OnCompletion is not NoOp"
+            },
+            {
+              "pc": [
+                66
+              ],
+              "errorMessage": "can only call when creating"
+            },
+            {
+              "pc": [
+                28
+              ],
+              "errorMessage": "can only call when not creating"
+            }
+          ],
+          "pcOffsetMethod": "none"
+        },
+        "clear": {
+          "sourceInfo": [],
+          "pcOffsetMethod": "none"
+        }
+      },
+      "source": {
+        "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuYXBwcm92YWxfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBIZWxsb1dvcmxkKEFSQzRDb250cmFjdCk6CiAgICB0eG4gTnVtQXBwQXJncwogICAgYnogbWFpbl9iYXJlX3JvdXRpbmdANgogICAgcHVzaGJ5dGVzIDB4MDJiZWNlMTEgLy8gbWV0aG9kICJoZWxsbyhzdHJpbmcpc3RyaW5nIgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAogICAgbWF0Y2ggbWFpbl9oZWxsb19yb3V0ZUAzCgptYWluX2FmdGVyX2lmX2Vsc2VAMTA6CiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgcHVzaGludCAwIC8vIDAKICAgIHJldHVybgoKbWFpbl9oZWxsb19yb3V0ZUAzOgogICAgLy8gc21hcnRfY29udHJhY3RzL2hlbGxvX3dvcmxkL2NvbnRyYWN0LnB5OjYKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQogICAgZXh0cmFjdCAyIDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo2CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIGNhbGxzdWIgaGVsbG8KICAgIGR1cAogICAgbGVuCiAgICBpdG9iCiAgICBleHRyYWN0IDYgMgogICAgc3dhcAogICAgY29uY2F0CiAgICBwdXNoYnl0ZXMgMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCm1haW5fYmFyZV9yb3V0aW5nQDY6CiAgICAvLyBzbWFydF9jb250cmFjdHMvaGVsbG9fd29ybGQvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgSGVsbG9Xb3JsZChBUkM0Q29udHJhY3QpOgogICAgdHhuIE9uQ29tcGxldGlvbgogICAgYm56IG1haW5fYWZ0ZXJfaWZfZWxzZUAxMAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4KCgovLyBzbWFydF9jb250cmFjdHMuaGVsbG9fd29ybGQuY29udHJhY3QuSGVsbG9Xb3JsZC5oZWxsbyhuYW1lOiBieXRlcykgLT4gYnl0ZXM6CmhlbGxvOgogICAgLy8gc21hcnRfY29udHJhY3RzL2hlbGxvX3dvcmxkL2NvbnRyYWN0LnB5OjYtNwogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgaGVsbG8oc2VsZiwgbmFtZTogU3RyaW5nKSAtPiBTdHJpbmc6CiAgICBwcm90byAxIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9oZWxsb193b3JsZC9jb250cmFjdC5weTo4CiAgICAvLyByZXR1cm4gIkhlbGxvLCAiICsgbmFtZQogICAgcHVzaGJ5dGVzICJIZWxsbywgIgogICAgZnJhbWVfZGlnIC0xCiAgICBjb25jYXQKICAgIHJldHN1Ygo=",
+        "clear": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"
+      },
+      "byteCode": {
+        "approval": "CjEbQQA0gAQCvs4RNhoAjgEAA4EAQzEZFEQxGEQ2GgFXAgCIACBJFRZXBgJMUIAEFR98dUxQsIEBQzEZQP/UMRgURIEBQ4oBAYAHSGVsbG8sIIv/UIk=",
+        "clear": "CoEBQw=="
+      },
+      "compilerInfo": {
+        "compiler": "puya",
+        "compilerVersion": {
+          "major": 4,
+          "minor": 5,
+          "patch": 3
+        }
+      },
+      "events": [],
+      "templateVariables": {}
+    } as Arc56Contract
 
-  it("(OK) Fee Covering Group Transactions with Default Values", async () => {
+    // Create Transaction Factory using Master KeyPair
+    const client = algorand.client.getAppFactory({
+      appSpec,
+      defaultSender: deployer.addr,
+      defaultSigner: deployer.signer
+    })
 
-    // create group transactions
+    const compilationResult = await client.compile()
 
-    // 0 Algo Amount transaction from master to master
-    const group_tx1 = algorandCrafter
-      .pay(0, masterKeyPair.id, masterKeyPair.id) // 0 Algo Amount to test default amount handling
-      .addFirstValidRound(params.firstValid)
-      .addLastValidRound(params.lastValid)
-      .addFee(2n * BigInt(params.minFee)) // Cover this + next transaction fees
-      .get()
-
-    // 0 Algo Amount transaction from secondary to secondary
-    const group_tx2 = algorandCrafter
-      .pay(0, secondaryKeyPair.id, secondaryKeyPair.id)
-      .addFirstValidRound(params.firstValid)
-      .addLastValidRound(params.lastValid)
-      .addFee(0) // 0 Algo Fee to test default value handling
-      .addNote("") // Explicitly empty note to test default value handling
-      .get()
+    const applicationCallTransaction = new ApplicationCallTxBuilder(genesisId, genesisHash)
+        .addSender(masterKeyPair.id)
+        .addApprovalProgram(compilationResult.approvalProgram)
+        .addClearStateProgram(compilationResult.clearStateProgram)
+        .addFirstValidRound(params.firstValid)
+        .addLastValidRound(params.lastValid)
+        .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
+        .get()
 
 
-    const groupId = (new AlgorandEncoder()).computeGroupId([group_tx1.encode(), group_tx2.encode()])
+    const encodedTxn = applicationCallTransaction.encode()
+    const signature = await sign(encodedTxn, masterKeyPair)
+    const signed = algorandCrafter.addSignature(encodedTxn, signature)
+    const {txid} = await algorand.client.algod.sendRawTransaction(signed).do()
+    const {applicationIndex} = await waitForConfirmation(txid, 20, algorand.client.algod)
 
-    group_tx1.grp = groupId
-    group_tx2.grp = groupId
+    const callMethodTransaction = new ApplicationCallTxBuilder(genesisId, genesisHash)
+        .addApplicationId(applicationIndex as bigint)
+        .addApplicationArgs([new Uint8Array(sha512_256.array(Buffer.from("hello(string)string")).slice(0, 4)), Buffer.from("world")])
+        .addSender(masterKeyPair.id)
+        .addFirstValidRound(params.firstValid)
+        .addLastValidRound(params.lastValid)
+        .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
+        .get()
 
-    const sig_gtx1 = await sign(group_tx1.encode(), masterKeyPair)
-    const sig_gtx2 = await sign(group_tx2.encode(), secondaryKeyPair)
-
-    const ready_gtx1 = algorandCrafter.addSignature(group_tx1.encode(), sig_gtx1)
-    const ready_gtx2 = algorandCrafter.addSignature(group_tx2.encode(), sig_gtx2)
-
-
-    const groupTxnResult = await algorand.client.algod.sendRawTransaction([ready_gtx1, ready_gtx2]).do();
-    await waitForConfirmation(groupTxnResult.txid, 20, algorand.client.algod)
-
-  })
-
-  it("(OK) Asset Create Transaction with Default Values", async () => {
-    const assetParams = new AssetParamsBuilder()
-      .addTotal(1000n)
-      .addDecimals(0)
-      .addDefaultFrozen(false) // explicitly setting to test default value handling
-      .addUnitName("CRAFT")
-      .addAssetName("Craft Token")
-      .addMetadataHash(new Uint8Array(32)) // empty hash to test default value handling
-      .addManagerAddress(masterKeyPair.id)
-      .addReserveAddress(masterKeyPair.id)
-      .addFreezeAddress(masterKeyPair.id)
-      .addClawbackAddress("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ") // zeroAddress to test default value handling
-      .get();
-
-    const txn = algorandCrafter
-      .createAsset(masterKeyPair.id, assetParams)
-      .addFirstValidRound(params.firstValid)
-      .addLastValidRound(params.lastValid)
-      .addFee(params.minFee)
-      .get();
-
-    const signature = await sign(txn.encode(), masterKeyPair)
-    const signedTxn = algorandCrafter.addSignature(txn.encode(), signature);
-    const assetCreationTxn = await algorand.client.algod.sendRawTransaction(signedTxn).do();
-    await waitForConfirmation(assetCreationTxn.txid, 20, algorand.client.algod)
+    const callMethodEncodedTxn = callMethodTransaction.encode()
+    const callMethodSignature = await sign(callMethodEncodedTxn, masterKeyPair)
+    const callMethodSigned = algorandCrafter.addSignature(callMethodEncodedTxn, callMethodSignature)
+    const callMethodResult = await algorand.client.algod.sendRawTransaction(callMethodSigned).do()
+    await waitForConfirmation(callMethodResult.txid, 20, algorand.client.algod)
   })
 })
