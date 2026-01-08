@@ -21,7 +21,7 @@ export const ALGORAND_ADDRESS_BAD_CHECKSUM_ERROR_MSG = "Bad checksum"
 /**
  * @category Encoding
  */
-export class AlgorandEncoder extends Encoder{
+export class AlgorandEncoder extends Encoder {
 	/**
 	 * decodeAddress takes an Algorand address in string form and decodes it into a Uint8Array.
 	 * @param address - an Algorand address with checksum.
@@ -60,9 +60,9 @@ export class AlgorandEncoder extends Encoder{
 	}
 
 	/**
-	 * 
-	 * @param stx 
-	 * @returns 
+	 * Encodes a signed transaction
+	 * @param stx - The signed transaction object to encode.
+	 * @returns The encoded signed transaction as a Uint8Array
 	 */
 	encodeSignedTransaction(stx: object): Uint8Array {
 		const encodedTxn: Uint8Array = new Uint8Array(msgpack.encode(stx, { sortKeys: true, ignoreUndefined: true }))
@@ -70,7 +70,7 @@ export class AlgorandEncoder extends Encoder{
 	}
 
 	/**
-	 *
+	 * Encodes a transaction and prepares it for signing by adding the "TX" tag
 	 * @param tx
 	 */
 	encodeTransaction(tx: Transaction): Uint8Array {
@@ -114,9 +114,9 @@ export class AlgorandEncoder extends Encoder{
 	computeGroupId(txns: Uint8Array[]): Uint8Array {
 		// ensure nr of txns in group are between 0 and 16
 		if (txns.length < 1 || txns.length > 16) throw new Error("Invalid number of transactions in group")
-		
-		
-		const hashes: Uint8Array[] = txns.map(txn => { 
+
+
+		const hashes: Uint8Array[] = txns.map(txn => {
 			let encoded: Uint8Array
 
 			try {
@@ -132,8 +132,8 @@ export class AlgorandEncoder extends Encoder{
 		})
 
 		// encode { txList: [tx1, tx2, ...] } with msgpack
-		const encodedTxList: Uint8Array = msgpack.encode({ txlist: hashes }, { sortKeys: true, ignoreUndefined: true }) 
-		
+		const encodedTxList: Uint8Array = msgpack.encode({ txlist: hashes }, { sortKeys: true, ignoreUndefined: true })
+
 		// Concat group tag + encoded
 		const concatTagList: Uint8Array = Encoder.ConcatArrays(Buffer.from("TG"), encodedTxList)
 
@@ -143,13 +143,14 @@ export class AlgorandEncoder extends Encoder{
 
 	/**
 	 * Casts a number or bigint to BigInt and checks if it's within the safe integer range.
+	 * Always returns a BigInt. Omission of default values (such as 0n) is handled in the calling code.
 	 * @param value - The number or bigint to be casted.
 	 * @returns The value as a BigInt.
 	 * @throws Error if the value is not within the safe integer range.
 	 */
 	static safeCastBigInt(value: number | bigint): bigint {
 		const bigIntValue = BigInt(value)
-if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
+		if (typeof value === "number" && (value < Number.MIN_SAFE_INTEGER || value > Number.MAX_SAFE_INTEGER)) {
 			throw new Error("Value is not within the safe integer range")
 		}
 		return bigIntValue

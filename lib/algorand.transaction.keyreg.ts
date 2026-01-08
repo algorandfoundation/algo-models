@@ -1,5 +1,5 @@
-import {AlgorandEncoder} from "./algorand.encoder.js"
-import {ITransactionHeaderBuilder, TransactionHeader} from "./algorand.transaction.header.js";
+import { AlgorandEncoder } from "./algorand.encoder.js";
+import { ITransactionHeaderBuilder, TransactionHeader } from "./algorand.transaction.header.js";
 
 /**
  * @category Transactions
@@ -68,7 +68,7 @@ export class KeyregTransaction extends TransactionHeader {
  * @category Builders
  * @internal
  */
-export interface IKeyregTxBuilder extends ITransactionHeaderBuilder<IKeyregTxBuilder>{
+export interface IKeyregTxBuilder extends ITransactionHeaderBuilder<IKeyregTxBuilder> {
 	/**
 	 * Add Participation PublicKey
 	 *
@@ -147,51 +147,61 @@ export class KeyregTxBuilder implements IKeyregTxBuilder {
 		return this
 	}
 	addVoteFirst(voteFirst: number | bigint): IKeyregTxBuilder {
-		this.tx.votefst = AlgorandEncoder.safeCastBigInt(voteFirst)
+		const safeCastVf = AlgorandEncoder.safeCastBigInt(voteFirst)
+		if (safeCastVf !== 0n) { this.tx.votefst = safeCastVf }
 		return this
 	}
 	addVoteLast(voteLast: number | bigint): IKeyregTxBuilder {
-		this.tx.votelst = AlgorandEncoder.safeCastBigInt(voteLast)
+		const safeCastVl = AlgorandEncoder.safeCastBigInt(voteLast)
+		if (safeCastVl !== 0n) { this.tx.votelst = safeCastVl }
 		return this
 	}
 	addVoteKeyDilution(voteKeyDilution: number | bigint): IKeyregTxBuilder {
-		this.tx.votekd = AlgorandEncoder.safeCastBigInt(voteKeyDilution)
+		const safeCastVkd = AlgorandEncoder.safeCastBigInt(voteKeyDilution)
+		if (safeCastVkd !== 0n) { this.tx.votekd = safeCastVkd }
 		return this
 	}
 	addNonParticipation(nonParticipation: boolean): IKeyregTxBuilder {
-		this.tx.nonpart = nonParticipation
+		if (nonParticipation) this.tx.nonpart = nonParticipation
 		return this
 	}
 	addSender(sender: string): IKeyregTxBuilder {
-		this.tx.snd = this.encoder.decodeAddress(sender)
+		const decoded = this.encoder.decodeAddress(sender)
+		if (!decoded.every(b => b === 0)) this.tx.snd = decoded
 		return this
 	}
 	addFee(fee: number | bigint): IKeyregTxBuilder {
-		this.tx.fee = AlgorandEncoder.safeCastBigInt(fee)
+		const safeFee = AlgorandEncoder.safeCastBigInt(fee)
+		if (safeFee !== 0n) { this.tx.fee = safeFee } else { delete this.tx.fee }
 		return this
 	}
 	addFirstValidRound(fv: number | bigint): IKeyregTxBuilder {
-		this.tx.fv = AlgorandEncoder.safeCastBigInt(fv)
+		const safeCastFv = AlgorandEncoder.safeCastBigInt(fv)
+		if (safeCastFv !== 0n) { this.tx.fv = safeCastFv }
 		return this
 	}
 	addLastValidRound(lv: number | bigint): IKeyregTxBuilder {
-		this.tx.lv = AlgorandEncoder.safeCastBigInt(lv)
+		const safeCastLv = AlgorandEncoder.safeCastBigInt(lv)
+		if (safeCastLv !== 0n) { this.tx.lv = safeCastLv }
 		return this
 	}
 	addNote(note: string, encoding: BufferEncoding = "utf8"): IKeyregTxBuilder {
-		this.tx.note = new Uint8Array(Buffer.from(note, encoding))
+		const parsed = new Uint8Array(Buffer.from(note, encoding))
+		if (parsed.length !== 0) { this.tx.note = parsed }
 		return this
 	}
 	addRekey(rekey: string): IKeyregTxBuilder {
-		this.tx.rekey = this.encoder.decodeAddress(rekey)
+		const decodedRekey = this.encoder.decodeAddress(rekey)
+		if (!decodedRekey.every(b => b === 0)) { this.tx.rekey = decodedRekey }
 		return this
 	}
-	addLease(lx: Uint8Array): IKeyregTxBuilder {
-		this.tx.lx = lx
+	addLease(lease: Uint8Array): IKeyregTxBuilder {
+		TransactionHeader.validateLease(lease)
+		this.tx.lx = lease
 		return this
 	}
-	addGroup(grp: Uint8Array): IKeyregTxBuilder {
-		this.tx.grp = grp
+	addGroup(group: Uint8Array): IKeyregTxBuilder {
+		this.tx.grp = group
 		return this
 	}
 	get(): KeyregTransaction {

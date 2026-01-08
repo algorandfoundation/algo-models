@@ -1,8 +1,16 @@
 /**
+ * @internal
+ */
+export const ALGORAND_LEASE_LENGTH_ERROR_MSG = "Lease length must be exactly 32 bytes"
+
+
+/**
  * Specifies the type of transaction. This value is automatically generated using any of the developer tools.
  * @category Common
  */
 export type TransactionType = "pay" | "keyreg" | "acfg" | "axfer" | "afrz" | "appl" | "stpf"
+
+
 
 /**
  *
@@ -24,25 +32,25 @@ export abstract class TransactionHeader {
      *
      * The address of the account that pays the fee and amount.
      */
-    snd: Uint8Array
+    snd?: Uint8Array
     /**
      * Fee
      *
      * Paid by the sender to the FeeSink to prevent denial-of-service. The minimum fee on Algorand is currently 1000 microAlgos.
      */
-    fee: bigint
+    fee?: bigint
     /**
      * First Valid
      *
      * The first round for when the transaction is valid. If the transaction is sent prior to this round it will be rejected by the network.
      */
-    fv: bigint
+    fv?: bigint
     /**
      * Last Valid
      *
      * The ending round for which the transaction is valid. After this round, the transaction will be rejected by the network.
      */
-    lv: bigint
+    lv?: bigint
     /**
      * Genesis Hash
      *
@@ -88,6 +96,17 @@ export abstract class TransactionHeader {
      * Assign a group ID to a transaction through the workflow described in the Atomic Transfers Guide.
      */
     grp?: Uint8Array
+
+    /**
+     * validateLease
+     * 
+     * static helped method to validate lease length
+     */
+    static validateLease(lx: Uint8Array) {
+        if (lx.length !== 32) {
+            throw new Error(ALGORAND_LEASE_LENGTH_ERROR_MSG)
+        }
+    }
 }
 
 /**

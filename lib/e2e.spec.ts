@@ -1,18 +1,16 @@
 import {AlgorandClient, waitForConfirmation} from '@algorandfoundation/algokit-utils'
 import {
-  AlgorandTransactionCrafter, ApplicationCallTransaction,
+  AlgorandTransactionCrafter,
   ApplicationCallTxBuilder,
   AssetConfigTransaction,
-  AssetParamsBuilder, Transaction
+  AssetParamsBuilder, 
 } from "./index";
-import algosdk, {ABIStringType, Address, SuggestedParams} from "algosdk";
+import {Address, SuggestedParams} from "algosdk";
 import {SigningAccount, TransactionSignerAccount} from "@algorandfoundation/algokit-utils/types/account";
 import {AlgoAmount} from "@algorandfoundation/algokit-utils/types/amount";
 import {encode} from "hi-base32";
 import {sha512_256} from "js-sha512";
 import {Arc56Contract} from "@algorandfoundation/algokit-utils/types/app-arc56";
-import {decode} from "algorand-msgpack";
-import * as msgpack from "algo-msgpack-with-bigint";
 
 export type KeyPairRecord = {
   id: string
@@ -23,11 +21,11 @@ const HASH_BYTES_LENGTH = 32;
 const ALGORAND_CHECKSUM_BYTE_LENGTH = 4;
 const ALGORAND_ADDRESS_LENGTH = 58;
 
-export async function sign(txn: Uint8Array, kpr: KeyPairRecord){
+export async function sign(txn: Uint8Array, kpr: KeyPairRecord) {
   const sig = await crypto.subtle.sign(
-      {name: 'Ed25519'},
-      kpr.keyPair.privateKey,
-      txn,
+    { name: 'Ed25519' },
+    kpr.keyPair.privateKey,
+    txn,
   );
   return new Uint8Array(sig)
 }
@@ -35,8 +33,8 @@ export async function sign(txn: Uint8Array, kpr: KeyPairRecord){
  * Get the address of a key pair
  * @param keyPair
  */
-export async function getAddress(keyPair: CryptoKeyPair){
-  const key= new Uint8Array(await crypto.subtle.exportKey("raw", keyPair.publicKey))
+export async function getAddress(keyPair: CryptoKeyPair) {
+  const key = new Uint8Array(await crypto.subtle.exportKey("raw", keyPair.publicKey))
   return encodeAddress(key)
 }
 /**
@@ -44,9 +42,9 @@ export async function getAddress(keyPair: CryptoKeyPair){
  * @param extractable
  * @param keyUsages
  */
-export async function generateKey(extractable: boolean = false, keyUsages: KeyUsage[] = ["sign"]){
-  const keyPair = (await crypto.subtle.generateKey({name: 'Ed25519'}, extractable, keyUsages) as CryptoKeyPair)
-  return {keyPair, id: await getAddress(keyPair)} as KeyPairRecord
+export async function generateKey(extractable: boolean = false, keyUsages: KeyUsage[] = ["sign"]) {
+  const keyPair = (await crypto.subtle.generateKey({ name: 'Ed25519' }, extractable, keyUsages) as CryptoKeyPair)
+  return { keyPair, id: await getAddress(keyPair) } as KeyPairRecord
 }
 /**
  * Encode a public key to an address
@@ -61,12 +59,12 @@ export function encodeAddress(publicKey: Uint8Array) {
  * Generate the checksum of a public key
  * @param publicKey
  */
-export function generateChecksum(publicKey: Uint8Array){
+export function generateChecksum(publicKey: Uint8Array) {
   return sha512_256.array(publicKey)
-      .slice(
-          HASH_BYTES_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH,
-          HASH_BYTES_LENGTH
-      );
+    .slice(
+      HASH_BYTES_LENGTH - ALGORAND_CHECKSUM_BYTE_LENGTH,
+      HASH_BYTES_LENGTH
+    );
 }
 
 describe('Algorand Transaction Crafter', () => {
@@ -90,8 +88,8 @@ describe('Algorand Transaction Crafter', () => {
     masterKeyPair = await generateKey()
     secondaryKeyPair = await generateKey()
 
-    await algorand.account.ensureFunded(masterKeyPair.id, deployer, new AlgoAmount({algos: 10}))
-    await algorand.account.ensureFunded(secondaryKeyPair.id, deployer, new AlgoAmount({algos: 10}))
+    await algorand.account.ensureFunded(masterKeyPair.id, deployer, new AlgoAmount({ algos: 10 }))
+    await algorand.account.ensureFunded(secondaryKeyPair.id, deployer, new AlgoAmount({ algos: 10 }))
 
     params = await algorand.getSuggestedParams()
     genesisId = params.genesisID as string
@@ -110,7 +108,7 @@ describe('Algorand Transaction Crafter', () => {
     const encodedTxn = txn.encode()
     const signature = await sign(encodedTxn, masterKeyPair)
     const signed = algorandCrafter.addSignature(encodedTxn, signature)
-    const {txid} = await algorand.client.algod.sendRawTransaction(signed).do()
+    const { txid } = await algorand.client.algod.sendRawTransaction(signed).do()
     await waitForConfirmation(txid, 20, algorand.client.algod)
   })
   it("(OK) KeyReg Online/Offline Transaction", async () => {
@@ -165,11 +163,11 @@ describe('Algorand Transaction Crafter', () => {
     const encodedTxn = txn.encode()
     const signature = await sign(encodedTxn, masterKeyPair)
     const signed = algorandCrafter.addSignature(encodedTxn, signature)
-    const {txid} = await algorand.client.algod.sendRawTransaction(signed).do()
+    const { txid } = await algorand.client.algod.sendRawTransaction(signed).do()
     await waitForConfirmation(txid, 20, algorand.client.algod)
   })
 
-  it("(OK) Asset Config Create/OptIn/Transfer/Destroy", async ()=>{
+  it("(OK) Asset Config Create/OptIn/Transfer/Destroy", async () => {
     const assetParams = new AssetParamsBuilder()
       .addTotal(1000)
       .addDecimals(1)
@@ -179,7 +177,7 @@ describe('Algorand Transaction Crafter', () => {
       .get()
 
     // create asset transaction
-    const createTxn: AssetConfigTransaction =  algorandCrafter
+    const createTxn: AssetConfigTransaction = algorandCrafter
       .createAsset(masterKeyPair.id, assetParams)
       .addFirstValidRound(params.firstValid)
       .addLastValidRound(params.lastValid)
@@ -190,7 +188,7 @@ describe('Algorand Transaction Crafter', () => {
     const createSignature = await sign(createEncodedTxn, masterKeyPair)
     const createSigned = algorandCrafter.addSignature(createEncodedTxn, createSignature)
     const createResult = await algorand.client.algod.sendRawTransaction(createSigned).do()
-    const {assetIndex} = await waitForConfirmation(createResult.txid, 20, algorand.client.algod)
+    const { assetIndex } = await waitForConfirmation(createResult.txid, 20, algorand.client.algod)
 
 
     const optInTxn = algorandCrafter
@@ -205,7 +203,7 @@ describe('Algorand Transaction Crafter', () => {
     const optInSignature = await sign(optInEncodedTxn, secondaryKeyPair)
     const optInSigned = algorandCrafter.addSignature(optInEncodedTxn, optInSignature)
     const optInResult = await algorand.client.algod.sendRawTransaction(optInSigned).do()
-    await waitForConfirmation(optInResult.txid, 20 , algorand.client.algod)
+    await waitForConfirmation(optInResult.txid, 20, algorand.client.algod)
 
 
 
@@ -220,24 +218,24 @@ describe('Algorand Transaction Crafter', () => {
     const transferSignature = await sign(transferEncodedTxn, masterKeyPair)
     const transferSigned = algorandCrafter.addSignature(transferEncodedTxn, transferSignature)
     const transferResult = await algorand.client.algod.sendRawTransaction(transferSigned).do()
-    await waitForConfirmation(transferResult.txid, 20 , algorand.client.algod)
+    await waitForConfirmation(transferResult.txid, 20, algorand.client.algod)
 
     const closeOutTxn = algorandCrafter
-        .transferAsset(secondaryKeyPair.id, assetIndex as bigint, secondaryKeyPair.id, 0)
-        .addAssetCloseTo(masterKeyPair.id)
-        .addFirstValidRound(params.firstValid)
-        .addLastValidRound(params.lastValid)
-        .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
-        .get()
+      .transferAsset(secondaryKeyPair.id, assetIndex as bigint, secondaryKeyPair.id, 0)
+      .addAssetCloseTo(masterKeyPair.id)
+      .addFirstValidRound(params.firstValid)
+      .addLastValidRound(params.lastValid)
+      .addFee(Number(params.fee) < 1000 ? 1000 : params.fee)
+      .get()
 
 
     const closeOutEncodedTxn = closeOutTxn.encode()
     const closeOutSignature = await sign(closeOutEncodedTxn, secondaryKeyPair)
     const closeOutSigned = algorandCrafter.addSignature(closeOutEncodedTxn, closeOutSignature)
     const closeOutResult = await algorand.client.algod.sendRawTransaction(closeOutSigned).do()
-    await waitForConfirmation(closeOutResult.txid, 20 , algorand.client.algod)
+    await waitForConfirmation(closeOutResult.txid, 20, algorand.client.algod)
 
-    const destroyTxn: AssetConfigTransaction =  algorandCrafter
+    const destroyTxn: AssetConfigTransaction = algorandCrafter
       .destroyAsset(masterKeyPair.id, assetIndex as bigint)
       .addFirstValidRound(params.firstValid)
       .addLastValidRound(params.lastValid)

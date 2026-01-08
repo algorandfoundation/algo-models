@@ -1,6 +1,6 @@
 {
   "name": "@algorandfoundation/algo-models",
-  "version": "1.0.0-canary.1",
+  "version": "1.0.0-canary.6",
   "description": "This package is meant for integrators that want to add Algorand's functionality to their applications",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,8 +15,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "commit": "cz",
-    "test": "jest lib --verbose --maxWorkers=1",
-    "test:cov": "jest lib --coverage --maxWorkers=1",
+    "test": "jest lib --verbose --maxWorkers=1 --testPathIgnorePatterns=lib/e2e",
+    "test:cov": "jest lib --coverage --maxWorkers=1 --testPathIgnorePatterns=lib/e2e",
+    "test:e2e": "jest lib/e2e --verbose --maxWorkers=1",
     "typedoc": "typedoc",
     "release": "semantic-release",
     "prepare": "husky install"
@@ -109,7 +110,8 @@
     ],
     "coveragePathIgnorePatterns": [
       "./coverage",
-      "./index.ts"
+      "./index.ts",
+      "e2e.spec.ts"
     ],
     "testEnvironment": "node",
     "moduleNameMapper": {
