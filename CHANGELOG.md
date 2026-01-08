@@ -1,3 +1,10 @@
+# [1.0.0-canary.7](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.6...v1.0.0-canary.7) (2026-01-08)
+
+
+### Features
+
+* application call transactions ([44e6baf](https://github.com/algorandfoundation/algo-models/commit/44e6baf1c328f130e0aedffc28921d1cfd5a2ae2))
+
 # [1.0.0-canary.6](https://github.com/algorandfoundation/algo-models/compare/v1.0.0-canary.5...v1.0.0-canary.6) (2025-12-09)
 
 
