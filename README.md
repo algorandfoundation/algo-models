@@ -40,6 +40,8 @@ $ git clone git@github.com:algorandfoundation/algo-models
 
 ## Tests
 
+The tests require a local instance of algod. If you have algokit installed : `algokit localnet start` will setup everything that you need. 
+
 ```shell
 $ yarn install
 $ yarn build

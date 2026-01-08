@@ -248,7 +248,7 @@ describe('Algorand Transaction Crafter', () => {
     const destroyResult = await algorand.client.algod.sendRawTransaction(destroySigned).do()
     await waitForConfirmation(destroyResult.txid, 20, algorand.client.algod)
   })
-  it("(OK Application Create/Delete)", async ()=>{
+  it("(OK Application Create/Delete) App Calls with appSpec", async ()=>{
     const appSpec = {
       "name": "HelloWorld",
       "structs": {},
